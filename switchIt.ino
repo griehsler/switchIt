@@ -8,6 +8,8 @@ const String CMD_OFF = "off";
 
 String otherAPSSID;
 String otherAPPassword;
+String hostName;
+String deviceName;
 
 void setup()
 {

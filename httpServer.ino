@@ -2,11 +2,14 @@
 #include <ESP8266HTTPUpdateServer.h>
 
 const unsigned int httpServerPort = 80;
+
 ESP8266WebServer server(httpServerPort);
 ESP8266HTTPUpdateServer httpUpdater;
 
 void prepareHttpServer()
 {
+  loadDeviceSettings();
+
   server.on("/", handleRoot);
   server.on("/config", handleConfig);
   server.on("/command", handleCommand);
@@ -37,9 +40,23 @@ void handleConfig()
   bool updatedSettings = server.args() > 0;
   if (updatedSettings)
   {
-    Serial.println("Assigning new WIFI settings.");
-    otherAPSSID = server.arg("ssid");
-    otherAPPassword = server.arg("password");
+    String kind = server.arg("kind");
+    if (kind == "wifi")
+    {
+      Serial.println("Assigning new WIFI settings.");
+      otherAPSSID = server.arg("ssid");
+      otherAPPassword = server.arg("password");
+      storeWifiSettings();
+    }
+    else if (kind == "identity")
+    {
+      Serial.println("Assigning new identity settings.");
+      hostName = server.arg("hostname");
+      deviceName = server.arg("devicename");
+      storeDeviceSettings();
+    }
+    else
+      Serial.println("Unsupported config kind: " + kind);
 
     message = "Stored new settings";
   }
@@ -47,20 +64,19 @@ void handleConfig()
   String sectionContent = getSectionContent("config");
   sectionContent = insertTemplateValue(sectionContent, "message", message);
   sectionContent = insertTemplateValue(sectionContent, "ssid", otherAPSSID);
+  sectionContent = insertTemplateValue(sectionContent, "hostname", hostName);
+  sectionContent = insertTemplateValue(sectionContent, "devicename", deviceName);
   sendSectionContent(sectionContent);
 
   if (updatedSettings)
-  {
-    storeWiFiSettings();
     onSettingsChanged();
-  }
 }
 
 void handleCommand()
 {
   Serial.print("Received command via web: ");
   Serial.println(server.arg("name"));
-  
+
   if (!executeCommand(server.arg("name")))
     server.send(400, "text/plain", "unknown command");
   else
