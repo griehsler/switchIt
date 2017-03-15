@@ -30,7 +30,7 @@ void handleHttpRequest()
 
 void handleRoot()
 {
-  sendSectionContent(getSectionContent("index"));
+  sendSectionContent(getIndexHtml());
 }
 
 void handleConfig()
@@ -55,18 +55,23 @@ void handleConfig()
       deviceName = server.arg("devicename");
       storeDeviceSettings();
     }
+    else if (kind == "reset")
+    {
+      Serial.println("Performing factory reset");
+      deleteAllFiles();
+    }
     else
+    {
       Serial.println("Unsupported config kind: " + kind);
+      updatedSettings = false;
+      message = "Server error!";
+    }
 
-    message = "Stored new settings";
+    if (message == "")
+      message = "Stored new settings";
   }
 
-  String sectionContent = getSectionContent("config");
-  sectionContent = insertTemplateValue(sectionContent, "message", message);
-  sectionContent = insertTemplateValue(sectionContent, "ssid", otherAPSSID);
-  sectionContent = insertTemplateValue(sectionContent, "hostname", hostName);
-  sectionContent = insertTemplateValue(sectionContent, "devicename", deviceName);
-  sendSectionContent(sectionContent);
+  sendSectionContent(getConfigHtml(message));
 
   if (updatedSettings)
     onSettingsChanged();
@@ -81,11 +86,6 @@ void handleCommand()
     server.send(400, "text/plain", "unknown command");
   else
     handleRoot();
-}
-
-String getSectionContent(String sectionName)
-{
-  return openFile("/http/" + sectionName + ".html");
 }
 
 String insertTemplateValue(String content, String placeHolder, String value)
