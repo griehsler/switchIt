@@ -1,5 +1,5 @@
 const int relayPin = D1;
-const int buttonPin = D8;
+const int buttonPin = D3;
 bool ledOn;
 bool relayOn;
 
@@ -45,15 +45,23 @@ void switchLed()
   led(!ledOn);
 }
 
+String getRelayState()
+{
+  if (relayOn)
+    return "ON";
+  else
+    return "OFF";
+}
+
 bool buttonPressed = false;
 
 void handleButton()
 {
   /*
-  bool currentlyPressed = digitalRead(buttonPin) == LOW;
-  led(currentlyPressed);
-  delay(500);
-  
+    bool currentlyPressed = digitalRead(buttonPin) == LOW;
+    led(currentlyPressed);
+    delay(500);
+
     Serial.print("Button is being pressed: ");
     if (currentlyPressed)
       Serial.println("true");
@@ -63,6 +71,6 @@ void handleButton()
     if (!buttonPressed && currentlyPressed)
       switchLed();
   */
-//  buttonPressed = currentlyPressed;
+  //  buttonPressed = currentlyPressed;
 }
 

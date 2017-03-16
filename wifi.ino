@@ -1,9 +1,17 @@
 #include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
 
 void setupNetwork()
 {
   if (!tryLoadWifiSettings() || !connectToWifi())
     startAP();
+  else
+  {
+  if (!MDNS.begin(hostName.c_str(), WiFi.localIP()))
+    Serial.println("Error setting up mDNS responder for device name '" + hostName + "'!");
+  else
+    Serial.println("mDNS responder for device name " + hostName + ".local started.");
+  }
 }
 
 bool connectToWifi()

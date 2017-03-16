@@ -1,5 +1,8 @@
 #include <WiFiUdp.h>
+#include <ESP8266mDNS.h>
 #include <functional>
+
+const String serviceType = "urn:Belkin:device:**";
 
 WiFiUDP UDP;
 IPAddress ipMulti(239, 255, 255, 250);
@@ -9,23 +12,19 @@ char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet
 String serial;
 String persistentUuid;
 
-boolean connectUDP()
+void connectUDP()
 {
-  boolean state = false;
+  prepareIds();
 
   Serial.print("Connecting to UDP ... ");
 
   if (UDP.beginMulticast(WiFi.localIP(), ipMulti, portMulti))
   {
     Serial.println("successful");
-    state = true;
+    MDNS.addService("ssdp", "udp", portMulti);
   }
   else
-  {
     Serial.println("failed!");
-  }
-
-  return state;
 }
 
 void respondToSearch() {
@@ -39,26 +38,18 @@ void respondToSearch() {
   IPAddress localIP = WiFi.localIP();
   char s[16];
   sprintf(s, "%d.%d.%d.%d", localIP[0], localIP[1], localIP[2], localIP[3]);
+  String serverUrl = String(s) + ":" + String(httpServerPort);
 
-  String response =
-    "HTTP/1.1 200 OK\r\n"
-    "CACHE-CONTROL: max-age=86400\r\n"
-    "DATE: Fri, 15 Apr 2016 04:56:29 GMT\r\n"
-    "EXT:\r\n"
-    "LOCATION: http://" + String(s) + ":" + String(httpServerPort) + "/setup.xml\r\n"
-    "OPT: \"http://schemas.upnp.org/upnp/1/0/\"; ns=01\r\n"
-    "01-NLS: b9200ebb-736d-4b93-bf03-835149d13983\r\n"
-    "SERVER: Unspecified, UPnP/1.0, Unspecified\r\n"
-    "ST: urn:Belkin:device:**\r\n"
-    "USN: uuid:" + persistentUuid + "::urn:Belkin:device:**\r\n"
-    "X-User-Agent: redsonic\r\n\r\n";
-
+  String response = getSsdpSearchResponse(serverUrl, persistentUuid, serviceType);
   UDP.beginPacket(UDP.remoteIP(), UDP.remotePort());
   UDP.write(response.c_str());
   UDP.endPacket();
 
 #ifdef DEBUG
   Serial.println("Response sent");
+#endif
+#ifdef DEBUG
+  Serial.print(response);
 #endif
 }
 
@@ -94,10 +85,8 @@ void handleUPNP()
     Serial.println(request);
 #endif
 
-    if (request.indexOf('M-SEARCH') > 0 && request.indexOf("urn:Belkin:device:**") > 0)
-    {
+    if (request.indexOf("M-SEARCH") != -1 && request.indexOf(serviceType) != -1)
       respondToSearch();
-    }
   }
 }
 
@@ -116,114 +105,67 @@ void prepareIds()
 
 void extendWebServer()
 {
-  server.on("/upnp/control/basicevent1", HTTP_POST, []()
-  {
-    String request = server.arg(0);
+  server.on("/upnp/control/basicevent1", HTTP_POST, handleBasicEventRequest);
+  server.on("/eventservice.xml", HTTP_GET, handleEventServiceRequest);
+  server.on("/setup.xml", HTTP_GET, handleSetupRequest);
+}
+
+void handleBasicEventRequest()
+{
+  String request = server.arg(0);
 
 #ifdef DEBUG
-    Serial.println("Responding to  /upnp/control/basicevent1 ...");
+  Serial.println("Responding to  /upnp/control/basicevent1 ...");
 
-    for (int x = 0; x <= server.args(); x++) {
-      Serial.println(server.arg(x));
-    }
-
-    Serial.print("request:");
-    Serial.println(request);
-#endif
-
-    if (request.indexOf("<BinaryState>1</BinaryState>") > 0) {
-      Serial.println("Got Turn on request via UPNP");
-      executeCommand(CMD_ON);
-    }
-
-    if (request.indexOf("<BinaryState>0</BinaryState>") > 0) {
-      Serial.println("Got Turn off request via UPNP");
-      executeCommand(CMD_OFF);
-    }
-
-    server.send(200, "text/plain", "");
+  for (int x = 0; x <= server.args(); x++) {
+    Serial.println(server.arg(x));
   }
-           );
 
-  server.on("/eventservice.xml", HTTP_GET, []()
-  {
-#ifdef DEBUG
-    Serial.println("Responding to eventservice.xml ...");
+  Serial.print("request:");
+  Serial.println(request);
 #endif
 
-    String eventservice_xml = "<?scpd xmlns=\"urn:Belkin:service-1-0\"?>"
-                              "<actionList>"
-                              "<action>"
-                              "<name>SetBinaryState</name>"
-                              "<argumentList>"
-                              "<argument>"
-                              "<retval/>"
-                              "<name>BinaryState</name>"
-                              "<relatedStateVariable>BinaryState</relatedStateVariable>"
-                              "<direction>in</direction>"
-                              "</argument>"
-                              "</argumentList>"
-                              "<serviceStateTable>"
-                              "<stateVariable sendEvents=\"yes\">"
-                              "<name>BinaryState</name>"
-                              "<dataType>Boolean</dataType>"
-                              "<defaultValue>0</defaultValue>"
-                              "</stateVariable>"
-                              "<stateVariable sendEvents=\"yes\">"
-                              "<name>level</name>"
-                              "<dataType>string</dataType>"
-                              "<defaultValue>0</defaultValue>"
-                              "</stateVariable>"
-                              "</serviceStateTable>"
-                              "</action>"
-                              "</scpd>\r\n"
-                              "\r\n";
-
-    server.send(200, "text/plain", eventservice_xml.c_str());
+  String reply = "";
+  if (request.indexOf("<BinaryState>1</BinaryState>") > 0) {
+    Serial.println("Got Turn on request via UPNP");
+    executeCommand(CMD_ON, &reply);
   }
-           );
 
-  server.on("/setup.xml", HTTP_GET, []()
-  {
-#ifdef DEBUG
-    Serial.println("Responding to setup.xml ...");
-#endif
-
-    IPAddress localIP = WiFi.localIP();
-    char s[16];
-    sprintf(s, "%d.%d.%d.%d", localIP[0], localIP[1], localIP[2], localIP[3]);
-
-    String setup_xml = "<?xml version=\"1.0\"?>"
-                       "<root>"
-                       "<device>"
-                       "<deviceType>urn:Belkin:device:controllee:1</deviceType>"
-                       "<friendlyName>" + deviceName + "</friendlyName>"
-                       "<manufacturer>Belkin International Inc.</manufacturer>"
-                       "<modelName>Emulated Socket</modelName>"
-                       "<modelNumber>3.1415</modelNumber>"
-                       "<UDN>uuid:" + persistentUuid + "</UDN>"
-                       "<serialNumber>221517K0101769</serialNumber>"
-                       "<binaryState>0</binaryState>"
-                       "<serviceList>"
-                       "<service>"
-                       "<serviceType>urn:Belkin:service:basicevent:1</serviceType>"
-                       "<serviceId>urn:Belkin:serviceId:basicevent1</serviceId>"
-                       "<controlURL>/upnp/control/basicevent1</controlURL>"
-                       "<eventSubURL>/upnp/event/basicevent1</eventSubURL>"
-                       "<SCPDURL>/eventservice.xml</SCPDURL>"
-                       "</service>"
-                       "</serviceList>"
-                       "</device>"
-                       "</root>\r\n"
-                       "\r\n";
-
-    server.send(200, "text/xml", setup_xml.c_str());
-
-#ifdef DEBUG
-    Serial.println("Sending:");
-    Serial.println(setup_xml);
-#endif
+  if (request.indexOf("<BinaryState>0</BinaryState>") > 0) {
+    Serial.println("Got Turn off request via UPNP");
+    executeCommand(CMD_OFF, &reply);
   }
-           );
+
+  server.send(200, "text/plain", reply);
+}
+
+void handleEventServiceRequest()
+{
+#ifdef DEBUG
+  Serial.println("Responding to eventservice.xml ...");
+#endif
+
+  String content = getEventServiceXml();
+  server.send(200, "text/plain", content.c_str());
+
+#ifdef DEBUG
+  Serial.println("Sending:");
+  Serial.println(content);
+#endif
+}
+
+void handleSetupRequest()
+{
+#ifdef DEBUG
+  Serial.println("Responding to setup.xml ...");
+#endif
+
+  String content = getSetupXml(deviceName, persistentUuid, serial);
+  server.send(200, "text/xml", content.c_str());
+
+#ifdef DEBUG
+  Serial.println("Sending:");
+  Serial.println(content);
+#endif
 }
 

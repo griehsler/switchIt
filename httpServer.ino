@@ -1,5 +1,6 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPUpdateServer.h>
+#include <ESP8266mDNS.h>
 
 const unsigned int httpServerPort = 80;
 
@@ -8,13 +9,12 @@ ESP8266HTTPUpdateServer httpUpdater;
 
 void prepareHttpServer()
 {
-  loadDeviceSettings();
-
   server.on("/", handleRoot);
   server.on("/config", handleConfig);
   server.on("/command", handleCommand);
   server.onNotFound(handleNotFound);
   httpUpdater.setup(&server);
+  MDNS.addService("http", "tcp", 80);
 }
 
 void startHttpServer()
@@ -26,6 +26,7 @@ void startHttpServer()
 void handleHttpRequest()
 {
   server.handleClient();
+  MDNS.update();
 }
 
 void handleRoot()
@@ -82,8 +83,11 @@ void handleCommand()
   Serial.print("Received command via web: ");
   Serial.println(server.arg("name"));
 
-  if (!executeCommand(server.arg("name")))
+  String reply;
+  if (!executeCommand(server.arg("name"), &reply))
     server.send(400, "text/plain", "unknown command");
+  else if (reply && reply != "")
+    server.send(200, "text/html", reply);
   else
     handleRoot();
 }
