@@ -57,20 +57,19 @@ bool buttonPressed = false;
 
 void handleButton()
 {
-  /*
-    bool currentlyPressed = digitalRead(buttonPin) == LOW;
-    led(currentlyPressed);
-    delay(500);
+#ifdef BUTTON_MODE
+  bool currentlyPressed = digitalRead(buttonPin) == LOW;
+  led(currentlyPressed);
 
-    Serial.print("Button is being pressed: ");
-    if (currentlyPressed)
-      Serial.println("true");
-    else
-      Serial.println("false");
+  if (BUTTON_MODE == "push" && !buttonPressed && currentlyPressed ||
+      BUTTON_MODE == "touch" && buttonPressed != currentlyPressed)
+  {
+    Serial.println("Button pressed, switching");
+    String reply;
+    executeCommand(CMD_SWITCH, &reply);
+  }
 
-    if (!buttonPressed && currentlyPressed)
-      switchLed();
-  */
-  //  buttonPressed = currentlyPressed;
+  buttonPressed = currentlyPressed;
+#endif
 }
 

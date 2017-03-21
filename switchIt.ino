@@ -1,6 +1,8 @@
-#define EMULATE_RELAY
-#define DEBUG
+//#define EMULATE_RELAY
+//#define DEBUG
 //#define FULLDEBUG
+//#define BUTTON_MODE "push"
+//#define BUTTON_MODE "touch"
 
 const String CMD_SWITCH = "switch";
 const String CMD_ON = "on";
@@ -11,6 +13,7 @@ String otherAPSSID;
 String otherAPPassword;
 String hostName;
 String deviceName;
+String persistentUuid;
 
 void setup()
 {
@@ -57,7 +60,8 @@ bool executeCommand(String commandName, String* reply)
   {
 
     String json = "{\n";
-    json += "  state: " + getRelayState() + "\n";
+    json += "  \"state\": \"" + getRelayState() + "\"\n";
+    json += "  \"uid\": \"" + persistentUuid + "\"\n";
     json += "}";
 #ifdef FULLDEBUG
     Serial.println("returning status:\n" + json);

@@ -10,7 +10,6 @@ unsigned int portMulti = 1900;      // local port to listen on
 char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet
 
 String serial;
-String persistentUuid;
 
 void connectUDP()
 {
