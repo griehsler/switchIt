@@ -60,7 +60,7 @@ bool executeCommand(String commandName, String* reply)
   {
 
     String json = "{\n";
-    json += "  \"state\": \"" + getRelayState() + "\"\n";
+    json += "  \"state\": \"" + getRelayState() + "\",\n";
     json += "  \"uid\": \"" + persistentUuid + "\"\n";
     json += "}";
 #ifdef FULLDEBUG
