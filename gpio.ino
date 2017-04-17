@@ -59,7 +59,6 @@ void handleButton()
 {
 #ifdef BUTTON_MODE
   bool currentlyPressed = digitalRead(buttonPin) == LOW;
-  led(currentlyPressed);
 
   if (BUTTON_MODE == "push" && !buttonPressed && currentlyPressed ||
       BUTTON_MODE == "touch" && buttonPressed != currentlyPressed)
