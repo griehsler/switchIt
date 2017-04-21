@@ -1,14 +1,15 @@
 const int relayPin = D1;
 const int buttonPin = D3;
+
 bool ledOn;
 bool relayOn;
+bool buttonPressed;
 
 void setupGPIO() {
   pinMode(BUILTIN_LED, OUTPUT);
   pinMode(relayPin, OUTPUT);
   pinMode(buttonPin, INPUT_PULLUP);
   led(false);
-  relay(false);
 }
 
 void led(bool on)
@@ -33,6 +34,8 @@ void relay(bool on)
 #ifdef EMULATE_RELAY
   led(on);
 #endif
+
+  storeState();
 }
 
 void switchRelay()
@@ -53,7 +56,10 @@ String getRelayState()
     return "OFF";
 }
 
-bool buttonPressed = false;
+void applyRelayState(String state)
+{
+  relay(state == "ON");
+}
 
 void handleButton()
 {

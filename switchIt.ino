@@ -2,7 +2,7 @@
 //#define DEBUG
 //#define FULLDEBUG
 //#define BUTTON_MODE "push"
-//#define BUTTON_MODE "touch"
+#define BUTTON_MODE "touch"
 
 const String CMD_SWITCH = "switch";
 const String CMD_ON = "on";
@@ -28,8 +28,9 @@ void setup()
   extendWebServer();
   startHttpServer();
   connectUDP();
-  Serial.println("initialization finished.");
   led(false);
+  applyState();
+  Serial.println("initialization finished.");
 }
 
 void loop()
@@ -59,10 +60,7 @@ bool executeCommand(String commandName, String* reply)
   if (commandName == CMD_STATUS)
   {
 
-    String json = "{\n";
-    json += "  \"state\": \"" + getRelayState() + "\",\n";
-    json += "  \"uid\": \"" + persistentUuid + "\"\n";
-    json += "}";
+    String json = getStatus();
 #ifdef FULLDEBUG
     Serial.println("returning status:\n" + json);
 #endif

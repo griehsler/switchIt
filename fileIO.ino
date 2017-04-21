@@ -32,14 +32,11 @@ void storeFile(String path, String content)
 
 void deleteAllFiles()
 {
-#ifdef DEBUG
   Serial.print("Formatting filesystem ... ");
-#endif
+
   if (!SPIFFS.format())
     Serial.println("Failed to format filesystem!");
-#ifdef DEBUG
-  //else
+  else
     Serial.println("done");
-#endif
 }
 
