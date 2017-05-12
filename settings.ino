@@ -32,7 +32,7 @@ void loadDeviceSettings()
     deviceName = deviceSettings["deviceName"].as<String>();
   }
 
-  Serial.println("HostName=" + hostName + ".local, DeviceName=" + deviceName);
+  Serial.println("HostName=" + hostName + ", DeviceName=" + deviceName);
 }
 
 bool tryLoadWifiSettings()

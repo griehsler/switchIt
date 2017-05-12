@@ -7,6 +7,8 @@ const unsigned int httpServerPort = 80;
 ESP8266WebServer server(httpServerPort);
 ESP8266HTTPUpdateServer httpUpdater;
 
+String dummyPassword = "*keep*old*";
+
 void prepareHttpServer()
 {
   server.on("/", handleRoot);
@@ -41,29 +43,31 @@ void handleConfig()
   bool updatedSettings = server.args() > 0;
   if (updatedSettings)
   {
-    String kind = server.arg("kind");
-    if (kind == "wifi")
+    String operation = server.arg("operation");
+    if (operation == "store")
     {
-      Serial.println("Assigning new WIFI settings.");
       otherAPSSID = server.arg("ssid");
-      otherAPPassword = server.arg("password");
-      storeWifiSettings();
-    }
-    else if (kind == "identity")
-    {
-      Serial.println("Assigning new identity settings.");
+      
+      String newPassword = server.arg("password");
+      if (newPassword != dummyPassword)
+        otherAPPassword = newPassword;
+
       hostName = server.arg("hostname");
       deviceName = server.arg("devicename");
+
+      storeWifiSettings();
       storeDeviceSettings();
+
+      Serial.println("Stored new settings.");
     }
-    else if (kind == "reset")
+    else if (operation == "reset")
     {
       Serial.println("Performing factory reset");
       deleteAllFiles();
     }
     else
     {
-      Serial.println("Unsupported config kind: " + kind);
+      Serial.println("Unsupported config operation: " + operation);
       updatedSettings = false;
       message = "Server error!";
     }
