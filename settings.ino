@@ -1,13 +1,12 @@
 #include <ArduinoJson.h>
 
-StaticJsonBuffer<512> jsonBuffer;
-
 const String wifiSettingsFile = "/config/wifi.json";
 const String deviceSettingsFile = "/config/device.json";
 const String statusFile = "/status.json";
 
 void storeDeviceSettings()
 {
+  StaticJsonBuffer<512> jsonBuffer;
   JsonObject& deviceSettings = jsonBuffer.createObject();
   deviceSettings["hostName"] = hostName;
   deviceSettings["deviceName"] = deviceName;
@@ -27,6 +26,7 @@ void loadDeviceSettings()
   }
   else
   {
+    StaticJsonBuffer<512> jsonBuffer;
     JsonObject& deviceSettings = jsonBuffer.parseObject(storedSettings);
     hostName = deviceSettings["hostName"].as<String>();
     deviceName = deviceSettings["deviceName"].as<String>();
@@ -44,6 +44,7 @@ bool tryLoadWifiSettings()
     return false;
   }
 
+  StaticJsonBuffer<512> jsonBuffer;
   JsonObject& deviceSettings = jsonBuffer.parseObject(storedSettings);
   otherAPSSID = deviceSettings["ssid"].as<String>();
   otherAPPassword = deviceSettings["password"].as<String>();
@@ -53,6 +54,7 @@ bool tryLoadWifiSettings()
 
 void storeWifiSettings()
 {
+  StaticJsonBuffer<512> jsonBuffer;
   JsonObject& wifiSettings = jsonBuffer.createObject();
   wifiSettings["ssid"] = otherAPSSID;
   wifiSettings["password"] = otherAPPassword;
@@ -64,7 +66,9 @@ void storeWifiSettings()
 String getStatus()
 {
   String result;
+  StaticJsonBuffer<512> jsonBuffer;
   JsonObject& statusJson = jsonBuffer.createObject();
+  statusJson["device"] = deviceName;
   statusJson["state"] = getRelayState();
   statusJson.prettyPrintTo(result);
   return result;
@@ -80,6 +84,7 @@ void applyState()
   String storedStatus = openFile(statusFile);
   if (storedStatus)
   {
+    StaticJsonBuffer<512> jsonBuffer;
     JsonObject& statusJson = jsonBuffer.parseObject(storedStatus);
     if (statusJson.success())
     {

@@ -28,6 +28,7 @@ void setup()
   extendWebServer();
   startHttpServer();
   connectUDP();
+  setupMQTT();
   led(false);
   applyState();
   Serial.println("initialization finished.");
@@ -38,6 +39,7 @@ void loop()
   handleButton();
   handleHttpRequest();
   handleUPNP();
+  handleMQTT();
 }
 
 bool executeCommand(String commandName, String* reply)

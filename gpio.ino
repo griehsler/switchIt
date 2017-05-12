@@ -35,6 +35,7 @@ void relay(bool on)
   led(on);
 #endif
 
+  reportStatus();
   storeState();
 }
 
