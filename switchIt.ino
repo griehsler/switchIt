@@ -15,6 +15,15 @@ String hostName;
 String deviceName;
 String persistentUuid;
 
+bool mqttEnabled = false;
+String mqttServer;
+int mqttServerPort = 1883;
+String mqttUserName;
+String mqttPassword;
+String mqttPublishTopic;
+String mqttSubscribeTopic;
+
+
 void setup()
 {
   setupGPIO();

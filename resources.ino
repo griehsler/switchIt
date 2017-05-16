@@ -23,14 +23,26 @@ String getConfigHtml(String message)
     "  <body>"
     "    <h2>" + message + "</h2>"
     "    <form action=\"/config\" method=\"post\">"
-    "      <div>"
+    "      <fieldset>"
+    "        <legend>WiFi settings</legend>"
     "        SSID: <br><input type=\"text\" name=\"ssid\" value=\"" + otherAPSSID + "\"><br>"
     "        Password: <br><input type=\"password\" name=\"password\" value=\"" + dummyPassword + "\"><br>"
-    "      </div>"
-    "      <div>"
+    "      </fieldset>"
+    "      <fieldset>"
+    "        <legend>Device settings</legend>"
     "        Device Name:<br/><input type=\"text\" name=\"devicename\" value=\"" + deviceName + "\"/><br/>"
     "        HostName:<br/><input type=\"text\" name=\"hostname\" value=\"" + hostName + "\"/></br/>"
-    "      </div>"
+    "      </fieldset>"
+    "      <fieldset>"
+    "        <legend>MQTT</legend>"
+    "        Enabled:<br/><input type=\"checkbox\" name=\"mqttenabled\" value=\"enabled\" " + toChecked(mqttEnabled) + "><br/>"
+    "        Broker Host:<br/><input type=\"text\" name=\"mqttserver\" value=\"" + mqttServer + "\"><br/>"
+    "        Broker Port:<br/><input type=\"number\" name=\"mqttserverport\" value=\"" + mqttServerPort + "\"><br/>"
+    "        Username:<br/><input type=\"text\" name=\"mqttusername\" value=\"" + mqttUserName + "\"><br/>"
+    "        Password:<br/><input type=\"password\" name=\"mqttpassword\" value=\"" + dummyPassword + "\"><br/>"
+    "        Subscribe Topic:<br/><input type=\"text\" name=\"mqttsubscribe\" value=\"" + mqttSubscribeTopic + "\"><br/>"
+    "        Publish Topic:<br/><input type=\"text\" name=\"mqttpublish\" value=\"" + mqttPublishTopic + "\"><br/>"
+    "      </fieldset>"
     "      <input type=\"hidden\" name=\"operation\" value=\"store\"/>"
     "      <input type=\"submit\" value=\"Save\">"
     "    </form>"
@@ -116,3 +128,12 @@ String getSsdpSearchResponse(String serverUrl, String uuid, String st)
     "USN: uuid:" + uuid + "::" + st + "\r\n"
     "X-User-Agent: redsonic\r\n\r\n";
 }
+
+String toChecked(bool value)
+{
+  if (value)
+    return "checked=\"checked\"";
+
+  return "";
+}
+

@@ -47,13 +47,23 @@ void handleConfig()
     if (operation == "store")
     {
       otherAPSSID = server.arg("ssid");
-      
+
       String newPassword = server.arg("password");
       if (newPassword != dummyPassword)
         otherAPPassword = newPassword;
 
       hostName = server.arg("hostname");
       deviceName = server.arg("devicename");
+
+      mqttEnabled = server.arg("mqttenabled") == "enabled";
+      mqttServer = server.arg("mqttserver");
+      mqttServerPort = server.arg("mqttserverport").toInt();
+      mqttUserName = server.arg("mqttusername");
+      String newMqttPassword = server.arg("mqttpassword");
+      if (newMqttPassword != dummyPassword)
+        mqttPassword = newMqttPassword;
+      mqttSubscribeTopic = server.arg("mqttsubscribe");
+      mqttPublishTopic = server.arg("mqttpublish");
 
       storeWifiSettings();
       storeDeviceSettings();

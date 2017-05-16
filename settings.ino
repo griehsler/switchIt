@@ -7,9 +7,18 @@ const String statusFile = "/status.json";
 void storeDeviceSettings()
 {
   StaticJsonBuffer<512> jsonBuffer;
+
   JsonObject& deviceSettings = jsonBuffer.createObject();
   deviceSettings["hostName"] = hostName;
   deviceSettings["deviceName"] = deviceName;
+  deviceSettings["mqttEnabled"] = mqttEnabled;
+  deviceSettings["mqttServer"] = mqttServer;
+  deviceSettings["mqttServerPort"] = mqttServerPort;
+  deviceSettings["mqttUserName"] = mqttUserName;
+  deviceSettings["mqttPassword"] = mqttPassword;
+  deviceSettings["mqttSubscribeTopic"] = mqttSubscribeTopic;
+  deviceSettings["mqttPublishTopic"] = mqttPublishTopic;
+
   String newSettings;
   deviceSettings.prettyPrintTo(newSettings);
   storeFile(deviceSettingsFile, newSettings);
@@ -28,8 +37,20 @@ void loadDeviceSettings()
   {
     StaticJsonBuffer<512> jsonBuffer;
     JsonObject& deviceSettings = jsonBuffer.parseObject(storedSettings);
+
     hostName = deviceSettings["hostName"].as<String>();
     deviceName = deviceSettings["deviceName"].as<String>();
+    mqttEnabled = deviceSettings["mqttEnabled"].as<bool>();
+    mqttServer = deviceSettings["mqttServer"].as<String>();
+    mqttServerPort = deviceSettings["mqttServerPort"].as<int>();
+    mqttUserName = deviceSettings["mqttUserName"].as<String>();
+    mqttPassword = deviceSettings["mqttPassword"].as<String>();
+    mqttSubscribeTopic = deviceSettings["mqttSubscribeTopic"].as<String>();
+    mqttPublishTopic = deviceSettings["mqttPublishTopic"].as<String>();
+
+#ifdef FULLDEBUG
+    deviceSettings.prettyPrintTo(Serial);
+#endif
   }
 
   Serial.println("HostName=" + hostName + ", DeviceName=" + deviceName);

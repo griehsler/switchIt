@@ -2,16 +2,8 @@
 
 WiFiClient wifiClient;
 PubSubClient client(wifiClient);
-char msg[50];
 
-String mqttServer = "newton.home";
-bool mqttEnabled = true;
-int mqttServerPort = 1883;
 String mqttClientId = String(ESP.getChipId());
-String mqttUserName = "tester";
-String mqttPassword = "test";
-String mqttPublishTopic = "light/status";
-String mqttSubscribeTopic = "light/tester/command";
 
 void setupMQTT()
 {
