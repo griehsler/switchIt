@@ -1,3 +1,5 @@
+#include "Settings.h"
+
 //#define EMULATE_RELAY
 //#define DEBUG
 //#define FULLDEBUG
@@ -9,20 +11,8 @@ const String CMD_ON = "on";
 const String CMD_OFF = "off";
 const String CMD_STATUS = "status";
 
-String otherAPSSID;
-String otherAPPassword;
-String hostName;
-String deviceName;
-String persistentUuid;
-
-bool mqttEnabled = false;
-String mqttServer;
-int mqttServerPort = 1883;
-String mqttUserName;
-String mqttPassword;
-String mqttPublishTopic;
-String mqttSubscribeTopic;
-
+SPIFFSStorage _storage;
+Settings _settings(&_storage);
 
 void setup()
 {
@@ -30,8 +20,7 @@ void setup()
   Serial.begin(115200);
   Serial.println("starting initialization ...");
   led(true);
-  setupStorage();
-  loadDeviceSettings();
+  _settings.loadDeviceSettings();
   setupNetwork();
   prepareHttpServer();
   extendWebServer();
@@ -39,7 +28,7 @@ void setup()
   connectUDP();
   setupMQTT();
   led(false);
-  applyState();
+  applyRelayState(_settings.getStoredState());
   Serial.println("initialization finished.");
 }
 
@@ -71,7 +60,7 @@ bool executeCommand(String commandName, String* reply)
   if (commandName == CMD_STATUS)
   {
 
-    String json = getStatus();
+    String json = _settings.getStatus(getRelayState());
 #ifdef FULLDEBUG
     Serial.println("returning status:\n" + json);
 #endif

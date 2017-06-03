@@ -1,10 +1,18 @@
+#pragma once
+
+#include "Settings.h"
 #include <ArduinoJson.h>
 
 const String wifiSettingsFile = "/config/wifi.json";
 const String deviceSettingsFile = "/config/device.json";
 const String statusFile = "/status.json";
 
-void storeDeviceSettings()
+Settings::Settings(Storage *storage)
+{
+  _storage = storage;
+}
+
+void Settings::storeDeviceSettings()
 {
   StaticJsonBuffer<512> jsonBuffer;
 
@@ -21,12 +29,12 @@ void storeDeviceSettings()
 
   String newSettings;
   deviceSettings.prettyPrintTo(newSettings);
-  storeFile(deviceSettingsFile, newSettings);
+  _storage->storeFile(deviceSettingsFile, newSettings);
 }
 
-void loadDeviceSettings()
+void Settings::loadDeviceSettings()
 {
-  String storedSettings = openFile(deviceSettingsFile);
+  String storedSettings = _storage->openFile(deviceSettingsFile);
   if (!storedSettings || storedSettings == "")
   {
     Serial.println("Found no device identity settings, using default values:");
@@ -56,9 +64,9 @@ void loadDeviceSettings()
   Serial.println("HostName=" + hostName + ", DeviceName=" + deviceName);
 }
 
-bool tryLoadWifiSettings()
+bool Settings::tryLoadWifiSettings()
 {
-  String storedSettings = openFile(wifiSettingsFile);
+  String storedSettings = _storage->openFile(wifiSettingsFile);
   if (!storedSettings || storedSettings == "")
   {
     Serial.println("Found no WIFI client settings.");
@@ -73,7 +81,7 @@ bool tryLoadWifiSettings()
   return true;
 }
 
-void storeWifiSettings()
+void Settings::storeWifiSettings()
 {
   StaticJsonBuffer<512> jsonBuffer;
   JsonObject& wifiSettings = jsonBuffer.createObject();
@@ -81,28 +89,28 @@ void storeWifiSettings()
   wifiSettings["password"] = otherAPPassword;
   String newSettings;
   wifiSettings.prettyPrintTo(newSettings);
-  storeFile(wifiSettingsFile, newSettings);
+  _storage->storeFile(wifiSettingsFile, newSettings);
 }
 
-String getStatus()
+String Settings::getStatus(String statusCode)
 {
   String result;
   StaticJsonBuffer<512> jsonBuffer;
   JsonObject& statusJson = jsonBuffer.createObject();
   statusJson["device"] = deviceName;
-  statusJson["state"] = getRelayState();
+  statusJson["state"] = statusCode;
   statusJson.prettyPrintTo(result);
   return result;
 }
 
-void storeState()
+void Settings::storeState(String statusCode)
 {
-  storeFile(statusFile, getStatus());
+  _storage->storeFile(statusFile, getStatus(statusCode));
 }
 
-void applyState()
+String Settings::getStoredState()
 {
-  String storedStatus = openFile(statusFile);
+  String storedStatus = _storage->openFile(statusFile);
   if (storedStatus)
   {
     StaticJsonBuffer<512> jsonBuffer;
@@ -113,7 +121,7 @@ void applyState()
       Serial.println("Read startup state, applying it.");
       Serial.println(storedStatus);
 #endif
-      applyRelayState(statusJson["state"]);
+      return statusJson["state"];
     }
   }
 }

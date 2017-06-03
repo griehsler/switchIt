@@ -5,7 +5,8 @@ bool ledOn;
 bool relayOn;
 bool buttonPressed;
 
-void setupGPIO() {
+void setupGPIO()
+{
   pinMode(BUILTIN_LED, OUTPUT);
   pinMode(relayPin, OUTPUT);
   pinMode(buttonPin, INPUT_PULLUP);
@@ -36,7 +37,7 @@ void relay(bool on)
 #endif
 
   reportStatus();
-  storeState();
+  _settings.storeState(getRelayState());
 }
 
 void switchRelay()
@@ -78,4 +79,3 @@ void handleButton()
   buttonPressed = currentlyPressed;
 #endif
 }
-

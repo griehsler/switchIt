@@ -10,6 +10,7 @@ unsigned int portMulti = 1900;      // local port to listen on
 char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet
 
 String serial;
+String persistentUuid;
 
 void connectUDP()
 {
@@ -159,7 +160,7 @@ void handleSetupRequest()
   Serial.println("Responding to setup.xml ...");
 #endif
 
-  String content = getSetupXml(deviceName, persistentUuid, serial);
+  String content = getSetupXml(_settings.deviceName, persistentUuid, serial);
   server.send(200, "text/xml", content.c_str());
 
 #ifdef DEBUG

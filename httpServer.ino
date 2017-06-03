@@ -46,34 +46,34 @@ void handleConfig()
     String operation = server.arg("operation");
     if (operation == "store")
     {
-      otherAPSSID = server.arg("ssid");
+      _settings.otherAPSSID = server.arg("ssid");
 
       String newPassword = server.arg("password");
       if (newPassword != dummyPassword)
-        otherAPPassword = newPassword;
+        _settings.otherAPPassword = newPassword;
 
-      hostName = server.arg("hostname");
-      deviceName = server.arg("devicename");
+      _settings.hostName = server.arg("hostname");
+      _settings.deviceName = server.arg("devicename");
 
-      mqttEnabled = server.arg("mqttenabled") == "enabled";
-      mqttServer = server.arg("mqttserver");
-      mqttServerPort = server.arg("mqttserverport").toInt();
-      mqttUserName = server.arg("mqttusername");
+      _settings.mqttEnabled = server.arg("mqttenabled") == "enabled";
+      _settings.mqttServer = server.arg("mqttserver");
+      _settings.mqttServerPort = server.arg("mqttserverport").toInt();
+      _settings.mqttUserName = server.arg("mqttusername");
       String newMqttPassword = server.arg("mqttpassword");
       if (newMqttPassword != dummyPassword)
-        mqttPassword = newMqttPassword;
-      mqttSubscribeTopic = server.arg("mqttsubscribe");
-      mqttPublishTopic = server.arg("mqttpublish");
+        _settings.mqttPassword = newMqttPassword;
+      _settings.mqttSubscribeTopic = server.arg("mqttsubscribe");
+      _settings.mqttPublishTopic = server.arg("mqttpublish");
 
-      storeWifiSettings();
-      storeDeviceSettings();
+      _settings.storeWifiSettings();
+      _settings.storeDeviceSettings();
 
       Serial.println("Stored new settings.");
     }
     else if (operation == "reset")
     {
       Serial.println("Performing factory reset");
-      deleteAllFiles();
+      _storage.deleteAllFiles();
     }
     else
     {

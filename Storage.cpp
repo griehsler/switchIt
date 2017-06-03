@@ -1,12 +1,21 @@
+#pragma once
+
+#include "Storage.h"
 #include "FS.h"
 
-void setupStorage()
+void SPIFFSStorage::ensureInitialized()
 {
-  SPIFFS.begin();
+  if (!_isInitialized)
+  {
+    _isInitialized = true;
+    SPIFFS.begin();
+  }
 }
 
-String openFile(String path)
+String SPIFFSStorage::openFile(String path)
 {
+  ensureInitialized();
+
   File file = SPIFFS.open(path, "r");
   if (!file)
   {
@@ -18,8 +27,10 @@ String openFile(String path)
   return line;
 }
 
-void storeFile(String path, String content)
+void SPIFFSStorage::storeFile(String path, String content)
 {
+  ensureInitialized();
+
   File file = SPIFFS.open(path, "w");
   if (!file)
     Serial.println("Failed to open '" + path + "' for writing!");
@@ -30,8 +41,10 @@ void storeFile(String path, String content)
   }
 }
 
-void deleteAllFiles()
+void SPIFFSStorage::deleteAllFiles()
 {
+  ensureInitialized();
+
   Serial.print("Formatting filesystem ... ");
 
   if (!SPIFFS.format())
@@ -39,4 +52,3 @@ void deleteAllFiles()
   else
     Serial.println("done");
 }
-

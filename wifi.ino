@@ -3,24 +3,24 @@
 
 void setupNetwork()
 {
-  if (!tryLoadWifiSettings() || !connectToWifi())
+  if (!_settings.tryLoadWifiSettings() || !connectToWifi())
     startAP();
   else
   {
-  if (!MDNS.begin(hostName.c_str(), WiFi.localIP()))
-    Serial.println("Error setting up mDNS responder for device name '" + hostName + "'!");
+  if (!MDNS.begin(_settings.hostName.c_str(), WiFi.localIP()))
+    Serial.println("Error setting up mDNS responder for device name '" + _settings.hostName + "'!");
   else
-    Serial.println("mDNS responder for device name " + hostName + ".local started.");
+    Serial.println("mDNS responder for device name " + _settings.hostName + ".local started.");
   }
 }
 
 bool connectToWifi()
 {
-  Serial.print("trying to connect to '" + otherAPSSID + "' ");
+  Serial.print("trying to connect to '" + _settings.otherAPSSID + "' ");
 
   WiFi.mode(WIFI_STA);
-  WiFi.hostname(hostName);
-  WiFi.begin(otherAPSSID.c_str(), otherAPPassword.c_str());
+  WiFi.hostname(_settings.hostName);
+  WiFi.begin(_settings.otherAPSSID.c_str(), _settings.otherAPPassword.c_str());
 
   for (int i = 0; i < 60; i++)
   {

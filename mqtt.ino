@@ -7,13 +7,13 @@ String mqttClientId = String(ESP.getChipId());
 
 void setupMQTT()
 {
-  if (!mqttEnabled)
+  if (!_settings.mqttEnabled)
   {
     Serial.println("MQTT is not enabled.");
     return;
   }
 
-  client.setServer(mqttServer.c_str(), mqttServerPort);
+  client.setServer(_settings.mqttServer.c_str(), _settings.mqttServerPort);
   client.setCallback(mqttCallback);
 
   mqttClientId = "ESP8266Client-";
@@ -25,9 +25,9 @@ void setupMQTT()
 #endif
 
   Serial.print("Connecting to MQTT server ");
-  Serial.print(mqttServer);
+  Serial.print(_settings.mqttServer);
   Serial.print(" ... ");
-  if (!client.connect(mqttClientId.c_str(), mqttUserName.c_str(), mqttPassword.c_str()))
+  if (!client.connect(mqttClientId.c_str(), _settings.mqttUserName.c_str(), _settings.mqttPassword.c_str()))
   {
     Serial.print("failed. rc=");
     Serial.println(client.state());
@@ -37,9 +37,9 @@ void setupMQTT()
   {
     Serial.println("done");
     reportStatus();
-    client.subscribe(mqttSubscribeTopic.c_str());
+    client.subscribe(_settings.mqttSubscribeTopic.c_str());
     Serial.print("subscribed to MQTT topic: ");
-    Serial.println(mqttSubscribeTopic);
+    Serial.println(_settings.mqttSubscribeTopic);
   }
 }
 
@@ -62,24 +62,24 @@ void mqttCallback(char* topic, byte* payload, unsigned int length)
 
 void publishMessage(String message)
 {
-  client.publish(mqttPublishTopic.c_str(), message.c_str());
+  client.publish(_settings.mqttPublishTopic.c_str(), message.c_str());
 
 #ifdef DEBUG
-  Serial.println("published message to MQTT topic '" + mqttPublishTopic + "': " + message);
+  Serial.println("published message to MQTT topic '" + _settings.mqttPublishTopic + "': " + message);
 #endif
 }
 
 void reportStatus()
 {
-  if (mqttEnabled && client.connected())
-    publishMessage(getStatus());
+  if (_settings.mqttEnabled && client.connected())
+    publishMessage(_settings.getStatus(getRelayState()));
 }
 
-bool clientDown = !mqttEnabled;
+bool clientDown = !_settings.mqttEnabled;
 
 void handleMQTT()
 {
-  if (mqttEnabled && !clientDown)
+  if (_settings.mqttEnabled && !clientDown)
   {
     if (!client.connected())
     {
@@ -90,4 +90,3 @@ void handleMQTT()
       client.loop();
   }
 }
-
