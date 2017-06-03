@@ -25,16 +25,17 @@ void led(bool on)
 
 void relay(bool on)
 {
-  if (on)
-    digitalWrite(relayPin, HIGH);
+  if (_settings.emulateRelay)
+    led(on);
   else
-    digitalWrite(relayPin, LOW);
+  {
+    if (on)
+      digitalWrite(relayPin, HIGH);
+    else
+      digitalWrite(relayPin, LOW);
+  }
 
   relayOn = on;
-
-#ifdef EMULATE_RELAY
-  led(on);
-#endif
 
   reportStatus();
   _settings.storeState(getRelayState());
@@ -65,17 +66,21 @@ void applyRelayState(String state)
 
 void handleButton()
 {
-#ifdef BUTTON_MODE
-  bool currentlyPressed = digitalRead(buttonPin) == LOW;
-
-  if (BUTTON_MODE == "push" && !buttonPressed && currentlyPressed ||
-      BUTTON_MODE == "touch" && buttonPressed != currentlyPressed)
+  bool isSwitch =_settings.buttonMode == _settings.BUTTON_SWITCH;
+  bool isTouch =_settings.buttonMode == _settings.BUTTON_TOUCH;
+  
+  if (isSwitch || isTouch)
   {
-    Serial.println("Button pressed, switching");
-    String reply;
-    executeCommand(CMD_SWITCH, &reply);
-  }
+    bool currentlyPressed = digitalRead(buttonPin) == LOW;
 
-  buttonPressed = currentlyPressed;
-#endif
+    if (isSwitch && !buttonPressed && currentlyPressed ||
+        isTouch && buttonPressed != currentlyPressed)
+    {
+      Serial.println("Button pressed, switching");
+      String reply;
+      executeCommand(CMD_SWITCH, &reply);
+    }
+
+    buttonPressed = currentlyPressed;
+  }
 }

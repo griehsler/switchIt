@@ -55,6 +55,8 @@ void handleConfig()
       _settings.hostName = server.arg("hostname");
       _settings.deviceName = server.arg("devicename");
 
+      _settings.buttonMode = server.arg("buttonmode").toInt();
+
       _settings.mqttEnabled = server.arg("mqttenabled") == "enabled";
       _settings.mqttServer = server.arg("mqttserver");
       _settings.mqttServerPort = server.arg("mqttserverport").toInt();
@@ -64,6 +66,8 @@ void handleConfig()
         _settings.mqttPassword = newMqttPassword;
       _settings.mqttSubscribeTopic = server.arg("mqttsubscribe");
       _settings.mqttPublishTopic = server.arg("mqttpublish");
+
+      _settings.emulateRelay = server.arg("emulaterelay") == "enabled";
 
       _settings.storeWifiSettings();
       _settings.storeDeviceSettings();

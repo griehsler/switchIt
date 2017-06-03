@@ -1,10 +1,7 @@
 #include "Settings.h"
 
-//#define EMULATE_RELAY
 //#define DEBUG
 //#define FULLDEBUG
-//#define BUTTON_MODE "push"
-#define BUTTON_MODE "touch"
 
 const String CMD_SWITCH = "switch";
 const String CMD_ON = "on";

@@ -11,6 +11,11 @@ public:
   String hostName;
   String deviceName;
 
+  const int BUTTON_DISABLED = 0;
+  const int BUTTON_SWITCH = 1;
+  const int BUTTON_TOUCH = 2;
+  int buttonMode = BUTTON_DISABLED;
+
   bool mqttEnabled = false;
   String mqttServer;
   int mqttServerPort = 1883;
@@ -18,6 +23,8 @@ public:
   String mqttPassword;
   String mqttPublishTopic;
   String mqttSubscribeTopic;
+
+  bool emulateRelay = false;
 
   void storeDeviceSettings();
   void loadDeviceSettings();

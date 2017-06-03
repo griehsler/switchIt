@@ -19,6 +19,7 @@ void Settings::storeDeviceSettings()
   JsonObject& deviceSettings = jsonBuffer.createObject();
   deviceSettings["hostName"] = hostName;
   deviceSettings["deviceName"] = deviceName;
+  deviceSettings["buttonMode"] = buttonMode;
   deviceSettings["mqttEnabled"] = mqttEnabled;
   deviceSettings["mqttServer"] = mqttServer;
   deviceSettings["mqttServerPort"] = mqttServerPort;
@@ -26,6 +27,7 @@ void Settings::storeDeviceSettings()
   deviceSettings["mqttPassword"] = mqttPassword;
   deviceSettings["mqttSubscribeTopic"] = mqttSubscribeTopic;
   deviceSettings["mqttPublishTopic"] = mqttPublishTopic;
+  deviceSettings["emulateRelay"] = emulateRelay;
 
   String newSettings;
   deviceSettings.prettyPrintTo(newSettings);
@@ -48,6 +50,7 @@ void Settings::loadDeviceSettings()
 
     hostName = deviceSettings["hostName"].as<String>();
     deviceName = deviceSettings["deviceName"].as<String>();
+    buttonMode = deviceSettings["buttonMode"].as<int>();
     mqttEnabled = deviceSettings["mqttEnabled"].as<bool>();
     mqttServer = deviceSettings["mqttServer"].as<String>();
     mqttServerPort = deviceSettings["mqttServerPort"].as<int>();
@@ -55,6 +58,7 @@ void Settings::loadDeviceSettings()
     mqttPassword = deviceSettings["mqttPassword"].as<String>();
     mqttSubscribeTopic = deviceSettings["mqttSubscribeTopic"].as<String>();
     mqttPublishTopic = deviceSettings["mqttPublishTopic"].as<String>();
+    emulateRelay = deviceSettings["emulateRelay"].as<bool>();
 
 #ifdef FULLDEBUG
     deviceSettings.prettyPrintTo(Serial);
