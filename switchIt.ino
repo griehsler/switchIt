@@ -1,4 +1,5 @@
 #include "Settings.h"
+#include "MQTT.h"
 
 //#define DEBUG
 //#define FULLDEBUG
@@ -10,6 +11,7 @@ const String CMD_STATUS = "status";
 
 SPIFFSStorage _storage;
 Settings _settings(&_storage);
+MQTT _mqtt(&_settings);
 
 void setup()
 {
@@ -23,7 +25,7 @@ void setup()
   extendWebServer();
   startHttpServer();
   connectUDP();
-  setupMQTT();
+  _mqtt.setup(executeCommand);
   led(false);
   applyRelayState(_settings.getStoredState());
   Serial.println("initialization finished.");
@@ -34,7 +36,7 @@ void loop()
   handleButton();
   handleHttpRequest();
   handleUPNP();
-  handleMQTT();
+  _mqtt.loop();
 }
 
 bool executeCommand(String commandName, String* reply)

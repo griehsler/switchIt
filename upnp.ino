@@ -1,12 +1,11 @@
 #include <WiFiUdp.h>
-#include <ESP8266mDNS.h>
 #include <functional>
 
 const String serviceType = "urn:Belkin:device:**";
 
 WiFiUDP UDP;
 IPAddress ipMulti(239, 255, 255, 250);
-unsigned int portMulti = 1900;      // local port to listen on
+const unsigned int portMulti = 1900;      // local port to listen on
 char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet
 
 String serial;

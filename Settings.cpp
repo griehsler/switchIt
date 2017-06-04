@@ -1,5 +1,3 @@
-#pragma once
-
 #include "Settings.h"
 #include <ArduinoJson.h>
 
@@ -31,12 +29,12 @@ void Settings::storeDeviceSettings()
 
   String newSettings;
   deviceSettings.prettyPrintTo(newSettings);
-  _storage->storeFile(deviceSettingsFile, newSettings);
+  _storage->writeFile(deviceSettingsFile, newSettings);
 }
 
 void Settings::loadDeviceSettings()
 {
-  String storedSettings = _storage->openFile(deviceSettingsFile);
+  String storedSettings = _storage->readFile(deviceSettingsFile);
   if (!storedSettings || storedSettings == "")
   {
     Serial.println("Found no device identity settings, using default values:");
@@ -70,7 +68,7 @@ void Settings::loadDeviceSettings()
 
 bool Settings::tryLoadWifiSettings()
 {
-  String storedSettings = _storage->openFile(wifiSettingsFile);
+  String storedSettings = _storage->readFile(wifiSettingsFile);
   if (!storedSettings || storedSettings == "")
   {
     Serial.println("Found no WIFI client settings.");
@@ -93,7 +91,7 @@ void Settings::storeWifiSettings()
   wifiSettings["password"] = otherAPPassword;
   String newSettings;
   wifiSettings.prettyPrintTo(newSettings);
-  _storage->storeFile(wifiSettingsFile, newSettings);
+  _storage->writeFile(wifiSettingsFile, newSettings);
 }
 
 String Settings::getStatus(String statusCode)
@@ -109,12 +107,12 @@ String Settings::getStatus(String statusCode)
 
 void Settings::storeState(String statusCode)
 {
-  _storage->storeFile(statusFile, getStatus(statusCode));
+  _storage->writeFile(statusFile, getStatus(statusCode));
 }
 
 String Settings::getStoredState()
 {
-  String storedStatus = _storage->openFile(statusFile);
+  String storedStatus = _storage->readFile(statusFile);
   if (storedStatus)
   {
     StaticJsonBuffer<512> jsonBuffer;
@@ -129,4 +127,3 @@ String Settings::getStoredState()
     }
   }
 }
-

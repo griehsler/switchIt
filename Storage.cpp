@@ -1,7 +1,5 @@
-#pragma once
-
 #include "Storage.h"
-#include "FS.h"
+#include <FS.h>
 
 void SPIFFSStorage::ensureInitialized()
 {
@@ -12,7 +10,7 @@ void SPIFFSStorage::ensureInitialized()
   }
 }
 
-String SPIFFSStorage::openFile(String path)
+String SPIFFSStorage::readFile(String path)
 {
   ensureInitialized();
 
@@ -27,7 +25,7 @@ String SPIFFSStorage::openFile(String path)
   return line;
 }
 
-void SPIFFSStorage::storeFile(String path, String content)
+void SPIFFSStorage::writeFile(String path, String content)
 {
   ensureInitialized();
 

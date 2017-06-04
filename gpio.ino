@@ -37,7 +37,7 @@ void relay(bool on)
 
   relayOn = on;
 
-  reportStatus();
+  _mqtt.reportStatus(getRelayState());
   _settings.storeState(getRelayState());
 }
 
@@ -66,15 +66,15 @@ void applyRelayState(String state)
 
 void handleButton()
 {
-  bool isSwitch =_settings.buttonMode == _settings.BUTTON_SWITCH;
-  bool isTouch =_settings.buttonMode == _settings.BUTTON_TOUCH;
-  
+  bool isSwitch = _settings.buttonMode == _settings.BUTTON_SWITCH;
+  bool isTouch = _settings.buttonMode == _settings.BUTTON_TOUCH;
+
   if (isSwitch || isTouch)
   {
     bool currentlyPressed = digitalRead(buttonPin) == LOW;
 
-    if (isSwitch && !buttonPressed && currentlyPressed ||
-        isTouch && buttonPressed != currentlyPressed)
+    if ((isSwitch && !buttonPressed && currentlyPressed) ||
+        (isTouch && buttonPressed != currentlyPressed))
     {
       Serial.println("Button pressed, switching");
       String reply;
