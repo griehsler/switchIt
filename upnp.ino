@@ -5,7 +5,7 @@ const String serviceType = "urn:Belkin:device:**";
 
 WiFiUDP UDP;
 IPAddress ipMulti(239, 255, 255, 250);
-const unsigned int portMulti = 1900;      // local port to listen on
+const unsigned int portMulti = 1900;       // local port to listen on
 char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet
 
 String serial;
@@ -26,7 +26,8 @@ void connectUDP()
     Serial.println("failed!");
 }
 
-void respondToSearch() {
+void respondToSearch()
+{
 #ifdef DEBUG
   Serial.print("Responding to search request back to ");
   Serial.print(UDP.remoteIP());
@@ -39,7 +40,7 @@ void respondToSearch() {
   sprintf(s, "%d.%d.%d.%d", localIP[0], localIP[1], localIP[2], localIP[3]);
   String serverUrl = String(s) + ":" + String(httpServerPort);
 
-  String response = getSsdpSearchResponse(serverUrl, persistentUuid, serviceType);
+  String response = _htmlProvider.getSsdpSearchResponse(serverUrl, persistentUuid, serviceType);
   UDP.beginPacket(UDP.remoteIP(), UDP.remotePort());
   UDP.write(response.c_str());
   UDP.endPacket();
@@ -94,9 +95,9 @@ void prepareIds()
   uint32_t chipId = ESP.getChipId();
   char uuid[64];
   sprintf_P(uuid, PSTR("38323636-4558-4dda-9188-cda0e6%02x%02x%02x"),
-            (uint16_t) ((chipId >> 16) & 0xff),
-            (uint16_t) ((chipId >>  8) & 0xff),
-            (uint16_t)   chipId        & 0xff);
+            (uint16_t)((chipId >> 16) & 0xff),
+            (uint16_t)((chipId >> 8) & 0xff),
+            (uint16_t)chipId & 0xff);
 
   serial = String(uuid);
   persistentUuid = "Socket-1_0-" + serial;
@@ -116,7 +117,8 @@ void handleBasicEventRequest()
 #ifdef DEBUG
   Serial.println("Responding to  /upnp/control/basicevent1 ...");
 
-  for (int x = 0; x <= server.args(); x++) {
+  for (int x = 0; x <= server.args(); x++)
+  {
     Serial.println(server.arg(x));
   }
 
@@ -125,12 +127,14 @@ void handleBasicEventRequest()
 #endif
 
   String reply = "";
-  if (request.indexOf("<BinaryState>1</BinaryState>") > 0) {
+  if (request.indexOf("<BinaryState>1</BinaryState>") > 0)
+  {
     Serial.println("Got Turn on request via UPNP");
     executeCommand(CMD_ON, &reply);
   }
 
-  if (request.indexOf("<BinaryState>0</BinaryState>") > 0) {
+  if (request.indexOf("<BinaryState>0</BinaryState>") > 0)
+  {
     Serial.println("Got Turn off request via UPNP");
     executeCommand(CMD_OFF, &reply);
   }
@@ -144,7 +148,7 @@ void handleEventServiceRequest()
   Serial.println("Responding to eventservice.xml ...");
 #endif
 
-  String content = getEventServiceXml();
+  String content = _htmlProvider.getEventServiceXml();
   server.send(200, "text/plain", content.c_str());
 
 #ifdef DEBUG
@@ -159,7 +163,7 @@ void handleSetupRequest()
   Serial.println("Responding to setup.xml ...");
 #endif
 
-  String content = getSetupXml(_settings.deviceName, persistentUuid, serial);
+  String content = _htmlProvider.getSetupXml(_settings.deviceName, persistentUuid, serial);
   server.send(200, "text/xml", content.c_str());
 
 #ifdef DEBUG
@@ -167,4 +171,3 @@ void handleSetupRequest()
   Serial.println(content);
 #endif
 }
-

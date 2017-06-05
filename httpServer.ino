@@ -33,7 +33,7 @@ void handleHttpRequest()
 
 void handleRoot()
 {
-  sendSectionContent(getIndexHtml());
+  sendSectionContent(_htmlProvider.getIndexHtml());
 }
 
 void handleConfig()
@@ -90,7 +90,7 @@ void handleConfig()
       message = "Stored new settings";
   }
 
-  sendSectionContent(getConfigHtml(message));
+  sendSectionContent(_htmlProvider.getConfigHtml(message, dummyPassword));
 
   if (updatedSettings)
     onSettingsChanged();

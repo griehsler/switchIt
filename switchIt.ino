@@ -1,5 +1,6 @@
 #include "Settings.h"
 #include "MQTT.h"
+#include "HTMLProvider.h"
 
 //#define DEBUG
 //#define FULLDEBUG
@@ -12,6 +13,7 @@ const String CMD_STATUS = "status";
 SPIFFSStorage _storage;
 Settings _settings(&_storage);
 MQTT _mqtt(&_settings);
+HTMLProvider _htmlProvider(&_settings);
 
 void setup()
 {
