@@ -2,9 +2,6 @@
 #include <ESP8266HTTPUpdateServer.h>
 #include <ESP8266mDNS.h>
 
-const unsigned int httpServerPort = 80;
-
-ESP8266WebServer server(httpServerPort);
 ESP8266HTTPUpdateServer httpUpdater;
 
 String dummyPassword = "*keep*old*";
@@ -102,7 +99,7 @@ void handleCommand()
   Serial.println(server.arg("name"));
 
   String reply;
-  if (!executeCommand(server.arg("name"), &reply))
+  if (!_commands.execute(server.arg("name"), &reply))
     server.send(400, "text/plain", "unknown command");
   else if (reply && reply != "")
     server.send(200, "text/html", reply);

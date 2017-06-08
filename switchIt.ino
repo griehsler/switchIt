@@ -1,74 +1,47 @@
+#include <ESP8266WebServer.h>
 #include "Settings.h"
 #include "MQTT.h"
 #include "HTMLProvider.h"
+#include "GPIO.h"
+#include "UPnP.h"
 
 //#define DEBUG
 //#define FULLDEBUG
 
-const String CMD_SWITCH = "switch";
-const String CMD_ON = "on";
-const String CMD_OFF = "off";
-const String CMD_STATUS = "status";
-
-SPIFFSStorage _storage;
+Storage _storage;
 Settings _settings(&_storage);
+ESP8266WebServer server(_settings.httpServerPort);
 MQTT _mqtt(&_settings);
 HTMLProvider _htmlProvider(&_settings);
+GPIO _gpio(&_settings, &_mqtt);
+Commands _commands(&_settings, &_gpio);
+UPnP _upnp(&server, &_settings, &_htmlProvider, &_commands);
 
 void setup()
 {
-  setupGPIO();
+  _gpio.setupGPIO();
   Serial.begin(115200);
   Serial.println("starting initialization ...");
-  led(true);
+  _gpio.led(true);
   _settings.loadDeviceSettings();
   setupNetwork();
   prepareHttpServer();
-  extendWebServer();
+  _upnp.extendWebServer();
   startHttpServer();
-  connectUDP();
-  _mqtt.setup(executeCommand);
-  led(false);
-  applyRelayState(_settings.getStoredState());
+  _upnp.connectUDP();
+  using namespace std::placeholders; // for `_1`
+  _mqtt.setup(std::bind(&Commands::execute, _commands, _1, _2));
+  _gpio.led(false);
+  _gpio.applyRelayState(_settings.getStoredState());
   Serial.println("initialization finished.");
 }
 
 void loop()
 {
-  handleButton();
+  _gpio.loop();
   handleHttpRequest();
-  handleUPNP();
+  _upnp.loop();
   _mqtt.loop();
-}
-
-bool executeCommand(String commandName, String* reply)
-{
-  if (commandName == CMD_SWITCH)
-  {
-    switchRelay();
-    return true;
-  }
-  if (commandName == CMD_ON)
-  {
-    relay(true);
-    return true;
-  }
-  if (commandName == CMD_OFF)
-  {
-    relay(false);
-    return true;
-  }
-  if (commandName == CMD_STATUS)
-  {
-
-    String json = _settings.getStatus(getRelayState());
-#ifdef FULLDEBUG
-    Serial.println("returning status:\n" + json);
-#endif
-    *reply = json;
-    return true;
-  }
-  return false;
 }
 
 void onSettingsChanged()

@@ -1,11 +1,12 @@
-const int relayPin = D1;
-const int buttonPin = D3;
+#include "GPIO.h"
 
-bool ledOn;
-bool relayOn;
-bool buttonPressed;
+GPIO::GPIO(Settings *settings, MQTT *mqtt)
+{
+  _settings = settings;
+  _mqtt = mqtt;
+}
 
-void setupGPIO()
+void GPIO::setupGPIO()
 {
   pinMode(BUILTIN_LED, OUTPUT);
   pinMode(relayPin, OUTPUT);
@@ -13,19 +14,17 @@ void setupGPIO()
   led(false);
 }
 
-void led(bool on)
+void GPIO::led(bool on)
 {
   if (on)
     digitalWrite(BUILTIN_LED, LOW);
   else
     digitalWrite(BUILTIN_LED, HIGH);
-
-  ledOn = on;
 }
 
-void relay(bool on)
+void GPIO::relay(bool on)
 {
-  if (_settings.emulateRelay)
+  if (_settings->emulateRelay)
     led(on);
   else
   {
@@ -37,21 +36,16 @@ void relay(bool on)
 
   relayOn = on;
 
-  _mqtt.reportStatus(getRelayState());
-  _settings.storeState(getRelayState());
+  _mqtt->reportStatus(getRelayState());
+  _settings->storeState(getRelayState());
 }
 
-void switchRelay()
+void GPIO::switchRelay()
 {
   relay(!relayOn);
 }
 
-void switchLed()
-{
-  led(!ledOn);
-}
-
-String getRelayState()
+String GPIO::getRelayState()
 {
   if (relayOn)
     return "ON";
@@ -59,15 +53,15 @@ String getRelayState()
     return "OFF";
 }
 
-void applyRelayState(String state)
+void GPIO::applyRelayState(String state)
 {
   relay(state == "ON");
 }
 
-void handleButton()
+void GPIO::loop()
 {
-  bool isSwitch = _settings.buttonMode == _settings.BUTTON_SWITCH;
-  bool isTouch = _settings.buttonMode == _settings.BUTTON_TOUCH;
+  bool isSwitch = _settings->buttonMode == _settings->BUTTON_SWITCH;
+  bool isTouch = _settings->buttonMode == _settings->BUTTON_TOUCH;
 
   if (isSwitch || isTouch)
   {
@@ -77,8 +71,7 @@ void handleButton()
         (isTouch && buttonPressed != currentlyPressed))
     {
       Serial.println("Button pressed, switching");
-      String reply;
-      executeCommand(CMD_SWITCH, &reply);
+      switchRelay();
     }
 
     buttonPressed = currentlyPressed;

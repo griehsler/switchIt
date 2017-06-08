@@ -1,7 +1,7 @@
 #include "Storage.h"
 #include <FS.h>
 
-void SPIFFSStorage::ensureInitialized()
+void Storage::ensureInitialized()
 {
   if (!_isInitialized)
   {
@@ -10,7 +10,7 @@ void SPIFFSStorage::ensureInitialized()
   }
 }
 
-String SPIFFSStorage::readFile(String path)
+String Storage::readFile(String path)
 {
   ensureInitialized();
 
@@ -25,7 +25,7 @@ String SPIFFSStorage::readFile(String path)
   return line;
 }
 
-void SPIFFSStorage::writeFile(String path, String content)
+void Storage::writeFile(String path, String content)
 {
   ensureInitialized();
 
@@ -39,7 +39,7 @@ void SPIFFSStorage::writeFile(String path, String content)
   }
 }
 
-void SPIFFSStorage::deleteAllFiles()
+void Storage::deleteAllFiles()
 {
   ensureInitialized();
 

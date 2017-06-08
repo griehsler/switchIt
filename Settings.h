@@ -6,6 +6,8 @@
 class Settings
 {
 public:
+  const int httpServerPort = 80;
+
   String otherAPSSID;
   String otherAPPassword;
   String hostName;

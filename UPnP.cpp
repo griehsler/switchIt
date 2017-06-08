@@ -1,17 +1,19 @@
-#include <WiFiUdp.h>
+#include "UPnP.h"
+
 #include <functional>
+#include <ESP8266mDNS.h>
 
-const String serviceType = "urn:Belkin:device:**";
+UPnP::UPnP(ESP8266WebServer *server, Settings *settings, HTMLProvider *htmlProvider, Commands *commands)
+{
+  _server = server;
+  _settings = settings;
+  _htmlProvider = htmlProvider;
+  _commands = commands;
 
-WiFiUDP UDP;
-IPAddress ipMulti(239, 255, 255, 250);
-const unsigned int portMulti = 1900;       // local port to listen on
-char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet
+  ipMulti = IPAddress(239, 255, 255, 250);
+}
 
-String serial;
-String persistentUuid;
-
-void connectUDP()
+void UPnP::connectUDP()
 {
   prepareIds();
 
@@ -26,7 +28,7 @@ void connectUDP()
     Serial.println("failed!");
 }
 
-void respondToSearch()
+void UPnP::respondToSearch()
 {
 #ifdef DEBUG
   Serial.print("Responding to search request back to ");
@@ -38,9 +40,9 @@ void respondToSearch()
   IPAddress localIP = WiFi.localIP();
   char s[16];
   sprintf(s, "%d.%d.%d.%d", localIP[0], localIP[1], localIP[2], localIP[3]);
-  String serverUrl = String(s) + ":" + String(httpServerPort);
+  String serverUrl = String(s) + ":" + String(_settings->httpServerPort);
 
-  String response = _htmlProvider.getSsdpSearchResponse(serverUrl, persistentUuid, serviceType);
+  String response = _htmlProvider->getSsdpSearchResponse(serverUrl, persistentUuid, serviceType);
   UDP.beginPacket(UDP.remoteIP(), UDP.remotePort());
   UDP.write(response.c_str());
   UDP.endPacket();
@@ -53,7 +55,7 @@ void respondToSearch()
 #endif
 }
 
-void handleUPNP()
+void UPnP::loop()
 {
   int packetSize = UDP.parsePacket();
 
@@ -90,7 +92,7 @@ void handleUPNP()
   }
 }
 
-void prepareIds()
+void UPnP::prepareIds()
 {
   uint32_t chipId = ESP.getChipId();
   char uuid[64];
@@ -103,23 +105,23 @@ void prepareIds()
   persistentUuid = "Socket-1_0-" + serial;
 }
 
-void extendWebServer()
+void UPnP::extendWebServer()
 {
-  server.on("/upnp/control/basicevent1", HTTP_POST, handleBasicEventRequest);
-  server.on("/eventservice.xml", HTTP_GET, handleEventServiceRequest);
-  server.on("/setup.xml", HTTP_GET, handleSetupRequest);
+  _server->on("/upnp/control/basicevent1", HTTP_POST, std::bind(&UPnP::handleBasicEventRequest, this));
+  _server->on("/eventservice.xml", HTTP_GET, std::bind(&UPnP::handleEventServiceRequest, this));
+  _server->on("/setup.xml", HTTP_GET, std::bind(&UPnP::handleSetupRequest, this));
 }
 
-void handleBasicEventRequest()
+void UPnP::handleBasicEventRequest()
 {
-  String request = server.arg(0);
+  String request = _server->arg(0);
 
 #ifdef DEBUG
   Serial.println("Responding to  /upnp/control/basicevent1 ...");
 
-  for (int x = 0; x <= server.args(); x++)
+  for (int x = 0; x <= _server->args(); x++)
   {
-    Serial.println(server.arg(x));
+    Serial.println(_server->arg(x));
   }
 
   Serial.print("request:");
@@ -130,26 +132,26 @@ void handleBasicEventRequest()
   if (request.indexOf("<BinaryState>1</BinaryState>") > 0)
   {
     Serial.println("Got Turn on request via UPNP");
-    executeCommand(CMD_ON, &reply);
+    _commands->on();
   }
 
   if (request.indexOf("<BinaryState>0</BinaryState>") > 0)
   {
     Serial.println("Got Turn off request via UPNP");
-    executeCommand(CMD_OFF, &reply);
+    _commands->off();
   }
 
-  server.send(200, "text/plain", reply);
+  _server->send(200, "text/plain", reply);
 }
 
-void handleEventServiceRequest()
+void UPnP::handleEventServiceRequest()
 {
 #ifdef DEBUG
   Serial.println("Responding to eventservice.xml ...");
 #endif
 
-  String content = _htmlProvider.getEventServiceXml();
-  server.send(200, "text/plain", content.c_str());
+  String content = _htmlProvider->getEventServiceXml();
+  _server->send(200, "text/plain", content.c_str());
 
 #ifdef DEBUG
   Serial.println("Sending:");
@@ -157,14 +159,14 @@ void handleEventServiceRequest()
 #endif
 }
 
-void handleSetupRequest()
+void UPnP::handleSetupRequest()
 {
 #ifdef DEBUG
   Serial.println("Responding to setup.xml ...");
 #endif
 
-  String content = _htmlProvider.getSetupXml(_settings.deviceName, persistentUuid, serial);
-  server.send(200, "text/xml", content.c_str());
+  String content = _htmlProvider->getSetupXml(_settings->deviceName, persistentUuid, serial);
+  _server->send(200, "text/xml", content.c_str());
 
 #ifdef DEBUG
   Serial.println("Sending:");
