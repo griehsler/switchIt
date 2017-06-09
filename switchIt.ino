@@ -1,5 +1,6 @@
 #include <ESP8266WebServer.h>
 #include "Settings.h"
+#include "Network.h"
 #include "MQTT.h"
 #include "HTMLProvider.h"
 #include "GPIO.h"
@@ -10,6 +11,7 @@
 
 Storage _storage;
 Settings _settings(&_storage);
+Network _network(&_settings);
 ESP8266WebServer server(_settings.httpServerPort);
 MQTT _mqtt(&_settings);
 HTMLProvider _htmlProvider(&_settings);
@@ -24,7 +26,7 @@ void setup()
   Serial.println("starting initialization ...");
   _gpio.led(true);
   _settings.loadDeviceSettings();
-  setupNetwork();
+  _network.setupNetwork();
   prepareHttpServer();
   _upnp.extendWebServer();
   startHttpServer();

@@ -1,26 +1,33 @@
+#include "Network.h"
+
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 
-void setupNetwork()
+Network::Network(Settings *settings)
 {
-  if (!_settings.tryLoadWifiSettings() || !connectToWifi())
+  _settings = settings;
+}
+
+void Network::setupNetwork()
+{
+  if (!_settings->tryLoadWifiSettings() || !connectToWifi())
     startAP();
   else
   {
-  if (!MDNS.begin(_settings.hostName.c_str(), WiFi.localIP()))
-    Serial.println("Error setting up mDNS responder for device name '" + _settings.hostName + "'!");
-  else
-    Serial.println("mDNS responder for device name " + _settings.hostName + ".local started.");
+    if (!MDNS.begin(_settings->hostName.c_str(), WiFi.localIP()))
+      Serial.println("Error setting up mDNS responder for device name '" + _settings->hostName + "'!");
+    else
+      Serial.println("mDNS responder for device name " + _settings->hostName + ".local started.");
   }
 }
 
-bool connectToWifi()
+bool Network::connectToWifi()
 {
-  Serial.print("trying to connect to '" + _settings.otherAPSSID + "' ");
+  Serial.print("trying to connect to '" + _settings->otherAPSSID + "' ");
 
   WiFi.mode(WIFI_STA);
-  WiFi.hostname(_settings.hostName);
-  WiFi.begin(_settings.otherAPSSID.c_str(), _settings.otherAPPassword.c_str());
+  WiFi.hostname(_settings->hostName);
+  WiFi.begin(_settings->otherAPSSID.c_str(), _settings->otherAPPassword.c_str());
 
   for (int i = 0; i < 60; i++)
   {
@@ -40,7 +47,7 @@ bool connectToWifi()
   return false;
 }
 
-void startAP()
+void Network::startAP()
 {
   String ssid = "SwitchIt" + String(ESP.getFlashChipId());
   IPAddress ip(192, 168, 1, 1);
