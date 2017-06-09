@@ -14,7 +14,7 @@ void Settings::storeDeviceSettings()
 {
   StaticJsonBuffer<512> jsonBuffer;
 
-  JsonObject& deviceSettings = jsonBuffer.createObject();
+  JsonObject &deviceSettings = jsonBuffer.createObject();
   deviceSettings["hostName"] = hostName;
   deviceSettings["deviceName"] = deviceName;
   deviceSettings["buttonMode"] = buttonMode;
@@ -44,7 +44,7 @@ void Settings::loadDeviceSettings()
   else
   {
     StaticJsonBuffer<512> jsonBuffer;
-    JsonObject& deviceSettings = jsonBuffer.parseObject(storedSettings);
+    JsonObject &deviceSettings = jsonBuffer.parseObject(storedSettings);
 
     hostName = deviceSettings["hostName"].as<String>();
     deviceName = deviceSettings["deviceName"].as<String>();
@@ -76,7 +76,7 @@ bool Settings::tryLoadWifiSettings()
   }
 
   StaticJsonBuffer<512> jsonBuffer;
-  JsonObject& deviceSettings = jsonBuffer.parseObject(storedSettings);
+  JsonObject &deviceSettings = jsonBuffer.parseObject(storedSettings);
   otherAPSSID = deviceSettings["ssid"].as<String>();
   otherAPPassword = deviceSettings["password"].as<String>();
 
@@ -86,7 +86,7 @@ bool Settings::tryLoadWifiSettings()
 void Settings::storeWifiSettings()
 {
   StaticJsonBuffer<512> jsonBuffer;
-  JsonObject& wifiSettings = jsonBuffer.createObject();
+  JsonObject &wifiSettings = jsonBuffer.createObject();
   wifiSettings["ssid"] = otherAPSSID;
   wifiSettings["password"] = otherAPPassword;
   String newSettings;
@@ -98,7 +98,7 @@ String Settings::getStatus(String statusCode)
 {
   String result;
   StaticJsonBuffer<512> jsonBuffer;
-  JsonObject& statusJson = jsonBuffer.createObject();
+  JsonObject &statusJson = jsonBuffer.createObject();
   statusJson["device"] = deviceName;
   statusJson["state"] = statusCode;
   statusJson.prettyPrintTo(result);
@@ -116,7 +116,7 @@ String Settings::getStoredState()
   if (storedStatus)
   {
     StaticJsonBuffer<512> jsonBuffer;
-    JsonObject& statusJson = jsonBuffer.parseObject(storedStatus);
+    JsonObject &statusJson = jsonBuffer.parseObject(storedStatus);
     if (statusJson.success())
     {
 #ifdef DEBUG

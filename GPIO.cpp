@@ -6,7 +6,7 @@ GPIO::GPIO(Settings *settings, MQTT *mqtt)
   _mqtt = mqtt;
 }
 
-void GPIO::setupGPIO()
+void GPIO::setup()
 {
   pinMode(BUILTIN_LED, OUTPUT);
   pinMode(relayPin, OUTPUT);

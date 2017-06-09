@@ -6,22 +6,22 @@
 
 class GPIO
 {
-  public:
-    int relayPin = D1;
-    int buttonPin = D3;
+public:
+  int relayPin = D1;
+  int buttonPin = D3;
 
-    GPIO(Settings *settings, MQTT *mqtt);
-    void setupGPIO();
-    void led(bool on);
-    void relay(bool on);
-    void switchRelay();
-    String getRelayState();
-    void applyRelayState(String state);
-    void loop();
+  GPIO(Settings *settings, MQTT *mqtt);
+  void setup();
+  void led(bool on);
+  void relay(bool on);
+  void switchRelay();
+  String getRelayState();
+  void applyRelayState(String state);
+  void loop();
 
-  private:
-    Settings *_settings;
-    MQTT *_mqtt;
-    bool relayOn;
-    bool buttonPressed;
+private:
+  Settings *_settings;
+  MQTT *_mqtt;
+  bool relayOn;
+  bool buttonPressed;
 };

@@ -4,12 +4,12 @@
 
 class Network
 {
-  public:
-    Network(Settings *settings);
-    void setupNetwork();
+public:
+  Network(Settings *settings);
+  void setup();
 
-  private:
-    Settings *_settings;
-    bool connectToWifi();
-    void startAP();
+private:
+  Settings *_settings;
+  bool connectToWifi();
+  void startAP();
 };

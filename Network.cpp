@@ -8,7 +8,7 @@ Network::Network(Settings *settings)
   _settings = settings;
 }
 
-void Network::setupNetwork()
+void Network::setup()
 {
   if (!_settings->tryLoadWifiSettings() || !connectToWifi())
     startAP();
