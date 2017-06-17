@@ -5,7 +5,7 @@
 
 UPnP::UPnP(HTTPServer *http, Settings *settings, HTMLProvider *htmlProvider, Commands *commands)
 {
-  http = http;
+  _http = http;
   _settings = settings;
   _htmlProvider = htmlProvider;
   _commands = commands;

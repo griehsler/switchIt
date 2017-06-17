@@ -36,8 +36,10 @@ void GPIO::relay(bool on)
 
   relayOn = on;
 
-  _mqtt->reportStatus(getRelayState());
-  _settings->storeState(getRelayState());
+  String newState = getRelayState();
+  if (_mqtt)
+    _mqtt->reportStatus(newState);
+  _settings->storeState(newState);
 }
 
 void GPIO::switchRelay()

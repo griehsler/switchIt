@@ -17,9 +17,8 @@ public:
 
 private:
   Settings *_settings;
-  PubSubClient _client;
+  PubSubClient *_client;
   MQTT_MESSAGE_CALLBACK;
-  String _mqttClientId;
 
   void publishMessage(String message);
   void mqttCallback(char *topic, byte *payload, unsigned int length);
