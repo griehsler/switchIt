@@ -79,7 +79,7 @@ void MQTT::publishMessage(String message)
 void MQTT::reportStatus(String statusCode)
 {
   if (_settings->mqttEnabled && _client->connected())
-    publishMessage(_settings->getStatus(statusCode));
+    publishMessage(_settings->getStateSummary(statusCode));
 }
 
 void MQTT::loop()

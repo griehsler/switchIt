@@ -10,7 +10,7 @@ Network::Network(Settings *settings)
 
 void Network::setup()
 {
-  if (!_settings->tryLoadWifiSettings() || !connectToWifi())
+  if (!_settings->otherAPSSID || _settings->otherAPSSID == "" || !connectToWifi())
     startAP();
   else
   {

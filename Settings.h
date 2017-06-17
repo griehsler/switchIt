@@ -6,6 +6,8 @@
 class Settings
 {
 public:
+  Settings(Storage *storage);
+
   const int httpServerPort = 80;
 
   String otherAPSSID;
@@ -28,16 +30,18 @@ public:
 
   bool emulateRelay = false;
 
-  void storeDeviceSettings();
-  void loadDeviceSettings();
-  bool tryLoadWifiSettings();
-  void storeWifiSettings();
-  String getStatus(String stateCode);
-  void storeState(String stateCode);
-  String getStoredState();
+  void load();
+  void store();
 
-  Settings(Storage *storage);
+  String getStoredState();
+  void storeState(String stateCode);
+
+  String getStateSummary(String stateCode);
 
 private:
   Storage *_storage;
+  void loadDeviceSettings();
+  void loadWifiSettings();
+  void storeDeviceSettings();
+  void storeWifiSettings();
 };

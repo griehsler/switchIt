@@ -14,8 +14,7 @@ public:
   ESP8266WebServer server;
 
   HTTPServer(Settings *settings, HTMLProvider *htmlProvider, Commands *commands, Storage *storage);
-  void prepareHttpServer();
-  void startHttpServer();
+  void start();
   void loop();
 
 private:

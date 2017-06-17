@@ -23,19 +23,17 @@ void setup()
 {
   using namespace std::placeholders; // for `_1`
 
-  _gpio.setup();
   Serial.begin(115200);
+  _gpio.setup();
   Serial.println("starting initialization ...");
   _gpio.led(true);
-  _settings.loadDeviceSettings();
+  _settings.load();
   _network.setup();
-  _http.prepareHttpServer();
-  _upnp.extendWebServer();
-  _http.startHttpServer();
-  _upnp.connectUDP();
+  _upnp.setup();
+  _http.start();
   _mqtt.setup(std::bind(&Commands::execute, _commands, _1, _2));
   _gpio.led(false);
-  _gpio.applyRelayState(_settings.getStoredState());
+  _gpio.restoreLastState();
   Serial.println("initialization finished.");
 }
 

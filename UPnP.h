@@ -11,8 +11,7 @@ class UPnP
 {
 public:
   UPnP(HTTPServer *http, Settings *settings, HTMLProvider *_htmlProvider, Commands *commands);
-  void connectUDP();
-  void extendWebServer();
+  void setup();
   void loop();
 
 private:
@@ -22,14 +21,17 @@ private:
   HTMLProvider *_htmlProvider;
   HTTPServer *_http;
   Commands *_commands;
-  WiFiUDP UDP;
-  IPAddress ipMulti;
-  const unsigned int portMulti = 1900;       // local port to listen on
-  char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet
-  String serial;
-  String persistentUuid;
+  WiFiUDP _UDP;
+  IPAddress _ipMulti;
+  const unsigned int _portMulti = 1900;       // local port to listen on
+  char _packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet
+  String _serial;
+  String _persistentUuid;
 
   void prepareIds();
+  void connectUDP();
+  void extendWebServer();
+
   void respondToSearch();
   void handleBasicEventRequest();
   void handleEventServiceRequest();

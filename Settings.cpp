@@ -10,6 +10,18 @@ Settings::Settings(Storage *storage)
   _storage = storage;
 }
 
+void Settings::load()
+{
+  loadDeviceSettings();
+  loadWifiSettings();
+}
+
+void Settings::store()
+{
+  storeDeviceSettings();
+  storeWifiSettings();
+}
+
 void Settings::storeDeviceSettings()
 {
   StaticJsonBuffer<512> jsonBuffer;
@@ -66,21 +78,19 @@ void Settings::loadDeviceSettings()
   Serial.println("HostName=" + hostName + ", DeviceName=" + deviceName);
 }
 
-bool Settings::tryLoadWifiSettings()
+void Settings::loadWifiSettings()
 {
   String storedSettings = _storage->readFile(wifiSettingsFile);
   if (!storedSettings || storedSettings == "")
   {
     Serial.println("Found no WIFI client settings.");
-    return false;
+    return;
   }
 
   StaticJsonBuffer<512> jsonBuffer;
   JsonObject &deviceSettings = jsonBuffer.parseObject(storedSettings);
   otherAPSSID = deviceSettings["ssid"].as<String>();
   otherAPPassword = deviceSettings["password"].as<String>();
-
-  return true;
 }
 
 void Settings::storeWifiSettings()
@@ -94,7 +104,7 @@ void Settings::storeWifiSettings()
   _storage->writeFile(wifiSettingsFile, newSettings);
 }
 
-String Settings::getStatus(String statusCode)
+String Settings::getStateSummary(String statusCode)
 {
   String result;
   StaticJsonBuffer<512> jsonBuffer;
@@ -107,7 +117,7 @@ String Settings::getStatus(String statusCode)
 
 void Settings::storeState(String statusCode)
 {
-  _storage->writeFile(statusFile, getStatus(statusCode));
+  _storage->writeFile(statusFile, getStateSummary(statusCode));
 }
 
 String Settings::getStoredState()

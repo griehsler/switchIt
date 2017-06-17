@@ -23,7 +23,7 @@ void Commands::off()
 
 String Commands::getStatus()
 {
-    String json = _settings->getStatus(_gpio->getRelayState());
+    String json = _settings->getStateSummary(_gpio->getRelayState());
 #ifdef FULLDEBUG
     Serial.println("returning status:\n" + json);
 #endif

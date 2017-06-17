@@ -16,7 +16,7 @@ public:
   void relay(bool on);
   void switchRelay();
   String getRelayState();
-  void applyRelayState(String state);
+  void restoreLastState();
   void loop();
 
 private:

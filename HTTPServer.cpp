@@ -12,20 +12,18 @@ HTTPServer::HTTPServer(Settings *settings, HTMLProvider *htmlProvider, Commands 
   server = ESP8266WebServer(_settings->httpServerPort);
 }
 
-void HTTPServer::prepareHttpServer()
+void HTTPServer::start()
 {
   server.on("/", std::bind(&HTTPServer::handleRoot, this));
   server.on("/config", std::bind(&HTTPServer::handleConfig, this));
   server.on("/command", std::bind(&HTTPServer::handleCommand, this));
   server.onNotFound(std::bind(&HTTPServer::handleNotFound, this));
   _httpUpdater.setup(&server);
-  MDNS.addService("http", "tcp", 80);
-}
 
-void HTTPServer::startHttpServer()
-{
   server.begin();
   Serial.println("HTTP server started");
+
+  MDNS.addService("http", "tcp", 80);
 }
 
 void HTTPServer::loop()
@@ -72,8 +70,7 @@ void HTTPServer::handleConfig()
 
       _settings->emulateRelay = server.arg("emulaterelay") == "enabled";
 
-      _settings->storeWifiSettings();
-      _settings->storeDeviceSettings();
+      _settings->store();
 
       Serial.println("Stored new settings.");
     }

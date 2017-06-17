@@ -10,19 +10,25 @@ UPnP::UPnP(HTTPServer *http, Settings *settings, HTMLProvider *htmlProvider, Com
   _htmlProvider = htmlProvider;
   _commands = commands;
 
-  ipMulti = IPAddress(239, 255, 255, 250);
+  _ipMulti = IPAddress(239, 255, 255, 250);
+
+  prepareIds();
+}
+
+void UPnP::setup()
+{
+  extendWebServer();
+  connectUDP();
 }
 
 void UPnP::connectUDP()
 {
-  prepareIds();
-
   Serial.print("Connecting to UDP ... ");
 
-  if (UDP.beginMulticast(WiFi.localIP(), ipMulti, portMulti))
+  if (_UDP.beginMulticast(WiFi.localIP(), _ipMulti, _portMulti))
   {
     Serial.println("successful");
-    MDNS.addService("ssdp", "udp", portMulti);
+    MDNS.addService("ssdp", "udp", _portMulti);
   }
   else
     Serial.println("failed!");
@@ -32,9 +38,9 @@ void UPnP::respondToSearch()
 {
 #ifdef DEBUG
   Serial.print("Responding to search request back to ");
-  Serial.print(UDP.remoteIP());
+  Serial.print(_UDP.remoteIP());
   Serial.print(":");
-  Serial.println(UDP.remotePort());
+  Serial.println(_UDP.remotePort());
 #endif
 
   IPAddress localIP = WiFi.localIP();
@@ -42,10 +48,10 @@ void UPnP::respondToSearch()
   sprintf(s, "%d.%d.%d.%d", localIP[0], localIP[1], localIP[2], localIP[3]);
   String serverUrl = String(s) + ":" + String(_settings->httpServerPort);
 
-  String response = _htmlProvider->getSsdpSearchResponse(serverUrl, persistentUuid, serviceType);
-  UDP.beginPacket(UDP.remoteIP(), UDP.remotePort());
-  UDP.write(response.c_str());
-  UDP.endPacket();
+  String response = _htmlProvider->getSsdpSearchResponse(serverUrl, _persistentUuid, serviceType);
+  _UDP.beginPacket(_UDP.remoteIP(), _UDP.remotePort());
+  _UDP.write(response.c_str());
+  _UDP.endPacket();
 
 #ifdef DEBUG
   Serial.println("Response sent");
@@ -57,15 +63,15 @@ void UPnP::respondToSearch()
 
 void UPnP::loop()
 {
-  int packetSize = UDP.parsePacket();
+  int packetSize = _UDP.parsePacket();
 
   if (packetSize)
   {
-    int len = UDP.read(packetBuffer, 255);
+    int len = _UDP.read(_packetBuffer, 255);
     if (len > 0)
-      packetBuffer[len] = 0;
+      _packetBuffer[len] = 0;
 
-    String request = packetBuffer;
+    String request = _packetBuffer;
 
 #ifdef FULLDEBUG
     Serial.println("");
@@ -73,7 +79,7 @@ void UPnP::loop()
     Serial.println(packetSize);
     Serial.print("From ");
 
-    IPAddress remote = UDP.remoteIP();
+    IPAddress remote = _UDP.remoteIP();
     for (int i = 0; i < 4; i++)
     {
       Serial.print(remote[i], DEC);
@@ -101,8 +107,8 @@ void UPnP::prepareIds()
             (uint16_t)((chipId >> 8) & 0xff),
             (uint16_t)chipId & 0xff);
 
-  serial = String(uuid);
-  persistentUuid = "Socket-1_0-" + serial;
+  _serial = String(uuid);
+  _persistentUuid = "Socket-1_0-" + _serial;
 }
 
 void UPnP::extendWebServer()
@@ -165,7 +171,7 @@ void UPnP::handleSetupRequest()
   Serial.println("Responding to setup.xml ...");
 #endif
 
-  String content = _htmlProvider->getSetupXml(_settings->deviceName, persistentUuid, serial);
+  String content = _htmlProvider->getSetupXml(_settings->deviceName, _persistentUuid, _serial);
   _http->server.send(200, "text/xml", content.c_str());
 
 #ifdef DEBUG
