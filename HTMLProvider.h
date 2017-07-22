@@ -16,4 +16,5 @@ public:
 private:
   Settings *_settings;
   String toChecked(bool value);
+  String commonHead();
 };
