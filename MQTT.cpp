@@ -1,5 +1,6 @@
 #include "MQTT.h"
 #include "WiFiClient.h"
+#include <functional>
 
 MQTT::MQTT(Settings *settings)
 {
