@@ -105,7 +105,9 @@ void HTTPServer::handleCommand()
 {
   Serial.print("Received command via web: ");
   Serial.println(server.arg("name"));
-  _logger->writeLog(LOG_INFO, "Received command via web: " + server.arg("name"));
+
+  if (server.arg("name") != _commands->CMD_STATUS)
+    _logger->writeLog(LOG_INFO, "Received command via web: " + server.arg("name"));
 
   String reply;
   if (!_commands->execute(server.arg("name"), &reply))

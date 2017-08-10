@@ -14,6 +14,8 @@ public:
   String getStatus();
   bool execute(String name, String *reply);
 
+  const String CMD_STATUS = "status";
+
 private:
   Settings *_settings;
   GPIO *_gpio;
@@ -21,5 +23,4 @@ private:
   const String CMD_SWITCH = "switch";
   const String CMD_ON = "on";
   const String CMD_OFF = "off";
-  const String CMD_STATUS = "status";
 };
