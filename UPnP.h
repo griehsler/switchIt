@@ -4,13 +4,13 @@
 #include "Settings.h"
 #include "HTMLProvider.h"
 #include "Commands.h"
-
+#include "Logger.h"
 #include <WiFiUdp.h>
 
 class UPnP
 {
 public:
-  UPnP(HTTPServer *http, Settings *settings, HTMLProvider *_htmlProvider, Commands *commands);
+  UPnP(Logger *logger, HTTPServer *http, Settings *settings, HTMLProvider *_htmlProvider, Commands *commands);
   void setup();
   void loop();
 
@@ -18,6 +18,7 @@ private:
   const String serviceType = "urn:Belkin:device:**";
 
   Settings *_settings;
+  Logger *_logger;
   HTMLProvider *_htmlProvider;
   HTTPServer *_http;
   Commands *_commands;

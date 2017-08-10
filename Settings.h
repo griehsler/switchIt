@@ -19,6 +19,10 @@ public:
   const int BUTTON_TOUCH = 2;
   int buttonMode = BUTTON_DISABLED;
 
+  bool syslogEnabled = false;
+  String syslogServer;
+  int syslogServerPort = 514;
+
   bool mqttEnabled = false;
   String mqttServer;
   int mqttServerPort = 1883;

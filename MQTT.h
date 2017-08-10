@@ -2,6 +2,7 @@
 
 #include "Settings.h"
 #include <PubSubClient.h>
+#include <functional>
 
 #define MQTT_MESSAGE_CALLBACK std::function<void(String, String *)> _callback
 

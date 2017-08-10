@@ -1,4 +1,5 @@
 #include "Settings.h"
+#include "Logger.h"
 #include "Network.h"
 #include "MQTT.h"
 #include "HTTPServer.h"
@@ -11,13 +12,14 @@
 
 Storage _storage;
 Settings _settings(&_storage);
+Logger _logger(&_settings);
 Network _network(&_settings);
 HTMLProvider _htmlProvider(&_settings);
 MQTT _mqtt(&_settings);
-GPIO _gpio(&_settings, &_mqtt);
+GPIO _gpio(&_settings, &_logger, &_mqtt);
 Commands _commands(&_settings, &_gpio);
-HTTPServer _http(&_settings, &_htmlProvider, &_commands, &_storage);
-UPnP _upnp(&_http, &_settings, &_htmlProvider, &_commands);
+HTTPServer _http(&_settings, &_logger, &_htmlProvider, &_commands, &_storage);
+UPnP _upnp(&_logger, &_http, &_settings, &_htmlProvider, &_commands);
 
 void setup()
 {
@@ -29,12 +31,15 @@ void setup()
   _gpio.led(true);
   _settings.load();
   _network.setup();
+  _logger.setup();
+  _logger.writeLog(LOG_NOTICE, "starting up");
   _upnp.setup();
-  _http.start();
+  _http.setup();
   _mqtt.setup(std::bind(&Commands::execute, _commands, _1, _2));
   _gpio.led(false);
   _gpio.restoreLastState();
   Serial.println("initialization finished.");
+  _logger.writeLog(LOG_INFO, "started successfully");
 }
 
 void loop()

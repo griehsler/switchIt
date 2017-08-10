@@ -2,9 +2,10 @@
 
 #include <ESP8266mDNS.h>
 
-HTTPServer::HTTPServer(Settings *settings, HTMLProvider *htmlProvider, Commands *commands, Storage *storage)
+HTTPServer::HTTPServer(Settings *settings, Logger *logger, HTMLProvider *htmlProvider, Commands *commands, Storage *storage)
 {
   _settings = settings;
+  _logger = logger;
   _commands = commands;
   _htmlProvider = htmlProvider;
   _storage = storage;
@@ -12,13 +13,13 @@ HTTPServer::HTTPServer(Settings *settings, HTMLProvider *htmlProvider, Commands 
   server = ESP8266WebServer(_settings->httpServerPort);
 }
 
-void HTTPServer::start()
+void HTTPServer::setup()
 {
   server.on("/", std::bind(&HTTPServer::handleRoot, this));
   server.on("/config", std::bind(&HTTPServer::handleConfig, this));
   server.on("/command", std::bind(&HTTPServer::handleCommand, this));
   server.onNotFound(std::bind(&HTTPServer::handleNotFound, this));
-  _httpUpdater.setup(&server);
+  _httpUpdater.setup(&server, "/update");
 
   server.begin();
   Serial.println("HTTP server started");
@@ -57,6 +58,10 @@ void HTTPServer::handleConfig()
       _settings->deviceName = server.arg("devicename");
 
       _settings->buttonMode = server.arg("buttonmode").toInt();
+
+      _settings->syslogEnabled = server.arg("syslogenabled") == "enabled";
+      _settings->syslogServer = server.arg("syslogserver");
+      _settings->syslogServerPort = server.arg("syslogserverport").toInt();
 
       _settings->mqttEnabled = server.arg("mqttenabled") == "enabled";
       _settings->mqttServer = server.arg("mqttserver");
@@ -100,6 +105,7 @@ void HTTPServer::handleCommand()
 {
   Serial.print("Received command via web: ");
   Serial.println(server.arg("name"));
+  _logger->writeLog(LOG_INFO, "Received command via web: " + server.arg("name"));
 
   String reply;
   if (!_commands->execute(server.arg("name"), &reply))

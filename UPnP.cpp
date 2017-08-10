@@ -3,8 +3,9 @@
 #include <functional>
 #include <ESP8266mDNS.h>
 
-UPnP::UPnP(HTTPServer *http, Settings *settings, HTMLProvider *htmlProvider, Commands *commands)
+UPnP::UPnP(Logger *logger, HTTPServer *http, Settings *settings, HTMLProvider *htmlProvider, Commands *commands)
 {
+  _logger = logger;
   _http = http;
   _settings = settings;
   _htmlProvider = htmlProvider;
@@ -137,13 +138,15 @@ void UPnP::handleBasicEventRequest()
   String reply = "";
   if (request.indexOf("<BinaryState>1</BinaryState>") > 0)
   {
-    Serial.println("Got Turn on request via UPNP");
+    Serial.println("Got turn on request via UPNP");
+    _logger->writeLog(LOG_INFO, "Got turn on request via UPNP");
     _commands->on();
   }
 
   if (request.indexOf("<BinaryState>0</BinaryState>") > 0)
   {
-    Serial.println("Got Turn off request via UPNP");
+    Serial.println("Got turn off request via UPNP");
+    _logger->writeLog(LOG_INFO, "Got turn off request via UPNP");
     _commands->off();
   }
 

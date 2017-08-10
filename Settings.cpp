@@ -30,6 +30,11 @@ void Settings::storeDeviceSettings()
   deviceSettings["hostName"] = hostName;
   deviceSettings["deviceName"] = deviceName;
   deviceSettings["buttonMode"] = buttonMode;
+
+  deviceSettings["syslogEnabled"] = syslogEnabled;
+  deviceSettings["syslogServer"] = syslogServer;
+  deviceSettings["syslogServerPort"] = syslogServerPort;
+
   deviceSettings["mqttEnabled"] = mqttEnabled;
   deviceSettings["mqttServer"] = mqttServer;
   deviceSettings["mqttServerPort"] = mqttServerPort;
@@ -37,6 +42,7 @@ void Settings::storeDeviceSettings()
   deviceSettings["mqttPassword"] = mqttPassword;
   deviceSettings["mqttSubscribeTopic"] = mqttSubscribeTopic;
   deviceSettings["mqttPublishTopic"] = mqttPublishTopic;
+
   deviceSettings["emulateRelay"] = emulateRelay;
 
   String newSettings;
@@ -61,6 +67,11 @@ void Settings::loadDeviceSettings()
     hostName = deviceSettings["hostName"].as<String>();
     deviceName = deviceSettings["deviceName"].as<String>();
     buttonMode = deviceSettings["buttonMode"].as<int>();
+
+    syslogEnabled = deviceSettings["syslogEnabled"].as<bool>();
+    syslogServer = deviceSettings["syslogServer"].as<String>();
+    syslogServerPort = deviceSettings["syslogServerPort"].as<int>();
+
     mqttEnabled = deviceSettings["mqttEnabled"].as<bool>();
     mqttServer = deviceSettings["mqttServer"].as<String>();
     mqttServerPort = deviceSettings["mqttServerPort"].as<int>();
@@ -68,6 +79,7 @@ void Settings::loadDeviceSettings()
     mqttPassword = deviceSettings["mqttPassword"].as<String>();
     mqttSubscribeTopic = deviceSettings["mqttSubscribeTopic"].as<String>();
     mqttPublishTopic = deviceSettings["mqttPublishTopic"].as<String>();
+
     emulateRelay = deviceSettings["emulateRelay"].as<bool>();
 
 #ifdef FULLDEBUG

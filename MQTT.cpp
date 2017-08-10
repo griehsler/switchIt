@@ -1,6 +1,5 @@
 #include "MQTT.h"
 #include "WiFiClient.h"
-#include <functional>
 
 MQTT::MQTT(Settings *settings)
 {
@@ -87,12 +86,12 @@ void MQTT::loop()
 {
   if (_settings->mqttEnabled)
   {
-    Serial.println("check status");
+    Serial.println("check MQTT connection status");
     if (!_client->connected())
       Serial.println("Lost MQTT connection!");
     else
     {
-      Serial.println("loop client");
+      Serial.println("MQTT loop client");
       _client->loop();
     }
   }

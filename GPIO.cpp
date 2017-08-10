@@ -1,8 +1,9 @@
 #include "GPIO.h"
 
-GPIO::GPIO(Settings *settings, MQTT *mqtt)
+GPIO::GPIO(Settings *settings, Logger *logger, MQTT *mqtt)
 {
   _settings = settings;
+  _logger = logger;
   _mqtt = mqtt;
 }
 
@@ -37,6 +38,7 @@ void GPIO::relay(bool on)
   relayOn = on;
 
   String newState = getRelayState();
+  _logger->writeLog(LOG_INFO, "switched state to: " + newState);
   if (_mqtt)
     _mqtt->reportStatus(newState);
   _settings->storeState(newState);
@@ -74,6 +76,7 @@ void GPIO::loop()
         (isTouch && buttonPressed != currentlyPressed))
     {
       Serial.println("Button pressed, switching");
+      _logger->writeLog(LOG_INFO, "Button pressed, switching");
       switchRelay();
     }
 
