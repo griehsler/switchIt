@@ -135,7 +135,8 @@ void Settings::storeState(String statusCode)
 String Settings::getStoredState()
 {
   String storedStatus = _storage->readFile(statusFile);
-  if (storedStatus)
+
+  if (storedStatus && storedStatus != "")
   {
     StaticJsonBuffer<512> jsonBuffer;
     JsonObject &statusJson = jsonBuffer.parseObject(storedStatus);
@@ -148,4 +149,6 @@ String Settings::getStoredState()
       return statusJson["state"];
     }
   }
+
+  return "OFF";
 }
