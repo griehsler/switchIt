@@ -57,6 +57,7 @@ String HTMLProvider::getConfigHtml(String message, String dummyPassword)
     "          <legend>Device Settings</legend>"
     "          Device Name:<br/><input type=\"text\" class=\"form-control\" name=\"devicename\" value=\"" + _settings->deviceName + "\"/><br/>"
     "          HostName:<br/><input type=\"text\" class=\"form-control\" name=\"hostname\" value=\"" + _settings->hostName + "\"/></br/>"
+    "          Invert Switch:<br/><input type=\"checkbox\" class=\"form-check-input\" name=\"invertswitch\" value=\"enabled\" " + toChecked( _settings->invertSwitch) + "></br/>"
     "        </fieldset>"
     "        <fieldset class=\"form-group\">"
     "          <legend>Physical Button</legend>"

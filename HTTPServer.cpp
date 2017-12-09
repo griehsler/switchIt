@@ -57,6 +57,7 @@ void HTTPServer::handleConfig()
       _settings->hostName = server.arg("hostname");
       _settings->deviceName = server.arg("devicename");
 
+      _settings->invertSwitch = server.arg("invertswitch") == "enabled";
       _settings->buttonMode = server.arg("buttonmode").toInt();
 
       _settings->syslogEnabled = server.arg("syslogenabled") == "enabled";

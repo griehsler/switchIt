@@ -29,7 +29,7 @@ void GPIO::relay(bool on)
     led(on);
   else
   {
-    if (on)
+    if (on ^ _settings->invertSwitch)
       digitalWrite(relayPin, HIGH);
     else
       digitalWrite(relayPin, LOW);

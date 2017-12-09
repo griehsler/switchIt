@@ -24,12 +24,13 @@ void Settings::store()
 
 void Settings::storeDeviceSettings()
 {
-  StaticJsonBuffer<512> jsonBuffer;
+  StaticJsonBuffer<1024> jsonBuffer;
 
   JsonObject &deviceSettings = jsonBuffer.createObject();
   deviceSettings["hostName"] = hostName;
   deviceSettings["deviceName"] = deviceName;
   deviceSettings["buttonMode"] = buttonMode;
+  deviceSettings["invertSwitch"] = invertSwitch;
 
   deviceSettings["syslogEnabled"] = syslogEnabled;
   deviceSettings["syslogServer"] = syslogServer;
@@ -61,12 +62,13 @@ void Settings::loadDeviceSettings()
   }
   else
   {
-    StaticJsonBuffer<512> jsonBuffer;
+    StaticJsonBuffer<1024> jsonBuffer;
     JsonObject &deviceSettings = jsonBuffer.parseObject(storedSettings);
 
     hostName = deviceSettings["hostName"].as<String>();
     deviceName = deviceSettings["deviceName"].as<String>();
     buttonMode = deviceSettings["buttonMode"].as<int>();
+    invertSwitch = deviceSettings["invertSwitch"].as<bool>();
 
     syslogEnabled = deviceSettings["syslogEnabled"].as<bool>();
     syslogServer = deviceSettings["syslogServer"].as<String>();

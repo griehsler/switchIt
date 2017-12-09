@@ -14,6 +14,8 @@ public:
   String hostName;
   String deviceName;
 
+  bool invertSwitch = false;
+
   const int BUTTON_DISABLED = 0;
   const int BUTTON_SWITCH = 1;
   const int BUTTON_TOUCH = 2;
