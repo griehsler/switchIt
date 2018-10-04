@@ -9,7 +9,7 @@ GPIO::GPIO(Settings *settings, Logger *logger, MQTT *mqtt)
 
 void GPIO::setup()
 {
-  pinMode(BUILTIN_LED, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
   pinMode(relayPin, OUTPUT);
   pinMode(buttonPin, INPUT_PULLUP);
   led(false);
@@ -18,9 +18,9 @@ void GPIO::setup()
 void GPIO::led(bool on)
 {
   if (on)
-    digitalWrite(BUILTIN_LED, LOW);
+    digitalWrite(LED_BUILTIN, LOW);
   else
-    digitalWrite(BUILTIN_LED, HIGH);
+    digitalWrite(LED_BUILTIN, HIGH);
 }
 
 void GPIO::relay(bool on)

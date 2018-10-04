@@ -114,21 +114,21 @@ void UPnP::prepareIds()
 
 void UPnP::extendWebServer()
 {
-  _http->server.on("/upnp/control/basicevent1", HTTP_POST, std::bind(&UPnP::handleBasicEventRequest, this));
-  _http->server.on("/eventservice.xml", HTTP_GET, std::bind(&UPnP::handleEventServiceRequest, this));
-  _http->server.on("/setup.xml", HTTP_GET, std::bind(&UPnP::handleSetupRequest, this));
+  _http->server->on("/upnp/control/basicevent1", HTTP_POST, std::bind(&UPnP::handleBasicEventRequest, this));
+  _http->server->on("/eventservice.xml", HTTP_GET, std::bind(&UPnP::handleEventServiceRequest, this));
+  _http->server->on("/setup.xml", HTTP_GET, std::bind(&UPnP::handleSetupRequest, this));
 }
 
 void UPnP::handleBasicEventRequest()
 {
-  String request = _http->server.arg(0);
+  String request = _http->server->arg(0);
 
 #ifdef DEBUG
   Serial.println("Responding to  /upnp/control/basicevent1 ...");
 
-  for (int x = 0; x <= _http->server.args(); x++)
+  for (int x = 0; x <= _http->server->args(); x++)
   {
-    Serial.println(_http->server.arg(x));
+    Serial.println(_http->server->arg(x));
   }
 
   Serial.print("request:");
@@ -150,7 +150,7 @@ void UPnP::handleBasicEventRequest()
     _commands->off();
   }
 
-  _http->server.send(200, "text/plain", reply);
+  _http->server->send(200, "text/plain", reply);
 }
 
 void UPnP::handleEventServiceRequest()
@@ -160,7 +160,7 @@ void UPnP::handleEventServiceRequest()
 #endif
 
   String content = _htmlProvider->getEventServiceXml();
-  _http->server.send(200, "text/plain", content.c_str());
+  _http->server->send(200, "text/plain", content.c_str());
 
 #ifdef DEBUG
   Serial.println("Sending:");
@@ -175,7 +175,7 @@ void UPnP::handleSetupRequest()
 #endif
 
   String content = _htmlProvider->getSetupXml(_settings->deviceName, _persistentUuid, _serial);
-  _http->server.send(200, "text/xml", content.c_str());
+  _http->server->send(200, "text/xml", content.c_str());
 
 #ifdef DEBUG
   Serial.println("Sending:");

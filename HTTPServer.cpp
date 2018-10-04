@@ -10,18 +10,19 @@ HTTPServer::HTTPServer(Settings *settings, Logger *logger, HTMLProvider *htmlPro
   _htmlProvider = htmlProvider;
   _storage = storage;
 
-  server = ESP8266WebServer(_settings->httpServerPort);
+  ESP8266WebServer newServer(_settings->httpServerPort);
+  server = &newServer;
 }
 
 void HTTPServer::setup()
 {
-  server.on("/", std::bind(&HTTPServer::handleRoot, this));
-  server.on("/config", std::bind(&HTTPServer::handleConfig, this));
-  server.on("/command", std::bind(&HTTPServer::handleCommand, this));
-  server.onNotFound(std::bind(&HTTPServer::handleNotFound, this));
-  _httpUpdater.setup(&server, "/update");
+  server->on("/", std::bind(&HTTPServer::handleRoot, this));
+  server->on("/config", std::bind(&HTTPServer::handleConfig, this));
+  server->on("/command", std::bind(&HTTPServer::handleCommand, this));
+  server->onNotFound(std::bind(&HTTPServer::handleNotFound, this));
+  _httpUpdater.setup(server, "/update");
 
-  server.begin();
+  server->begin();
   Serial.println("HTTP server started");
 
   MDNS.addService("http", "tcp", 80);
@@ -29,7 +30,7 @@ void HTTPServer::setup()
 
 void HTTPServer::loop()
 {
-  server.handleClient();
+  server->handleClient();
   MDNS.update();
 }
 
@@ -42,39 +43,39 @@ void HTTPServer::handleConfig()
 {
   String message = "";
 
-  bool updatedSettings = server.args() > 0;
+  bool updatedSettings = server->args() > 0;
   if (updatedSettings)
   {
-    String operation = server.arg("operation");
+    String operation = server->arg("operation");
     if (operation == "store")
     {
-      _settings->otherAPSSID = server.arg("ssid");
+      _settings->otherAPSSID = server->arg("ssid");
 
-      String newPassword = server.arg("password");
+      String newPassword = server->arg("password");
       if (newPassword != dummyPassword)
         _settings->otherAPPassword = newPassword;
 
-      _settings->hostName = server.arg("hostname");
-      _settings->deviceName = server.arg("devicename");
+      _settings->hostName = server->arg("hostname");
+      _settings->deviceName = server->arg("devicename");
 
-      _settings->invertSwitch = server.arg("invertswitch") == "enabled";
-      _settings->buttonMode = server.arg("buttonmode").toInt();
+      _settings->invertSwitch = server->arg("invertswitch") == "enabled";
+      _settings->buttonMode = server->arg("buttonmode").toInt();
 
-      _settings->syslogEnabled = server.arg("syslogenabled") == "enabled";
-      _settings->syslogServer = server.arg("syslogserver");
-      _settings->syslogServerPort = server.arg("syslogserverport").toInt();
+      _settings->syslogEnabled = server->arg("syslogenabled") == "enabled";
+      _settings->syslogServer = server->arg("syslogserver");
+      _settings->syslogServerPort = server->arg("syslogserverport").toInt();
 
-      _settings->mqttEnabled = server.arg("mqttenabled") == "enabled";
-      _settings->mqttServer = server.arg("mqttserver");
-      _settings->mqttServerPort = server.arg("mqttserverport").toInt();
-      _settings->mqttUserName = server.arg("mqttusername");
-      String newMqttPassword = server.arg("mqttpassword");
+      _settings->mqttEnabled = server->arg("mqttenabled") == "enabled";
+      _settings->mqttServer = server->arg("mqttserver");
+      _settings->mqttServerPort = server->arg("mqttserverport").toInt();
+      _settings->mqttUserName = server->arg("mqttusername");
+      String newMqttPassword = server->arg("mqttpassword");
       if (newMqttPassword != dummyPassword)
         _settings->mqttPassword = newMqttPassword;
-      _settings->mqttSubscribeTopic = server.arg("mqttsubscribe");
-      _settings->mqttPublishTopic = server.arg("mqttpublish");
+      _settings->mqttSubscribeTopic = server->arg("mqttsubscribe");
+      _settings->mqttPublishTopic = server->arg("mqttpublish");
 
-      _settings->emulateRelay = server.arg("emulaterelay") == "enabled";
+      _settings->emulateRelay = server->arg("emulaterelay") == "enabled";
 
       _settings->store();
 
@@ -105,16 +106,16 @@ void HTTPServer::handleConfig()
 void HTTPServer::handleCommand()
 {
   Serial.print("Received command via web: ");
-  Serial.println(server.arg("name"));
+  Serial.println(server->arg("name"));
 
-  if (server.arg("name") != _commands->CMD_STATUS)
-    _logger->writeLog(LOG_INFO, "Received command via web: " + server.arg("name"));
+  if (server->arg("name") != _commands->CMD_STATUS)
+    _logger->writeLog(LOG_INFO, "Received command via web: " + server->arg("name"));
 
   String reply;
-  if (!_commands->execute(server.arg("name"), &reply))
-    server.send(400, "text/plain", "unknown command");
+  if (!_commands->execute(server->arg("name"), &reply))
+    server->send(400, "text/plain", "unknown command");
   else if (reply && reply != "")
-    server.send(200, "text/html", reply);
+    server->send(200, "text/html", reply);
   else
     handleRoot();
 }
@@ -132,11 +133,11 @@ void HTTPServer::sendSectionContent(String content)
   if (!content)
     handleNotFound();
 
-  server.send(200, "text/html", content);
+  server->send(200, "text/html", content);
 }
 
 void HTTPServer::handleNotFound()
 {
-  server.send(404, "text/plain", "Invalid address!");
-  Serial.println("Rejected access to '" + server.uri() + "'.");
+  server->send(404, "text/plain", "Invalid address!");
+  Serial.println("Rejected access to '" + server->uri() + "'.");
 }
