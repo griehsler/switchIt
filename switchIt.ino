@@ -7,8 +7,12 @@
 #include "GPIO.h"
 #include "UPnP.h"
 
+#include <ESP8266WebServer.h>
+
 //#define DEBUG
 //#define FULLDEBUG
+
+ESP8266WebServer server(80);
 
 Storage _storage;
 Settings _settings(&_storage);
@@ -18,7 +22,7 @@ HTMLProvider _htmlProvider(&_settings);
 MQTT _mqtt(&_settings);
 GPIO _gpio(&_settings, &_logger, &_mqtt);
 Commands _commands(&_settings, &_gpio);
-HTTPServer _http(&_settings, &_logger, &_htmlProvider, &_commands, &_storage);
+HTTPServer _http(&server, &_settings, &_logger, &_htmlProvider, &_commands, &_storage);
 UPnP _upnp(&_logger, &_http, &_settings, &_htmlProvider, &_commands);
 
 void setup()

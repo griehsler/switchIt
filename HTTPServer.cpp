@@ -2,7 +2,7 @@
 
 #include <ESP8266mDNS.h>
 
-HTTPServer::HTTPServer(Settings *settings, Logger *logger, HTMLProvider *htmlProvider, Commands *commands, Storage *storage)
+HTTPServer::HTTPServer(ESP8266WebServer *server, Settings *settings, Logger *logger, HTMLProvider *htmlProvider, Commands *commands, Storage *storage)
 {
   _settings = settings;
   _logger = logger;
@@ -10,12 +10,12 @@ HTTPServer::HTTPServer(Settings *settings, Logger *logger, HTMLProvider *htmlPro
   _htmlProvider = htmlProvider;
   _storage = storage;
 
-  ESP8266WebServer newServer(_settings->httpServerPort);
-  server = &newServer;
+  this->server = server;
 }
 
 void HTTPServer::setup()
 {
+  // Serial.println("HTTP server starting");
   server->on("/", std::bind(&HTTPServer::handleRoot, this));
   server->on("/config", std::bind(&HTTPServer::handleConfig, this));
   server->on("/command", std::bind(&HTTPServer::handleCommand, this));

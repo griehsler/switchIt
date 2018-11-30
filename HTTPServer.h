@@ -14,7 +14,7 @@ class HTTPServer
 public:
   ESP8266WebServer *server;
 
-  HTTPServer(Settings *settings, Logger *logger, HTMLProvider *htmlProvider, Commands *commands, Storage *storage);
+  HTTPServer(ESP8266WebServer *server, Settings *settings, Logger *logger, HTMLProvider *htmlProvider, Commands *commands, Storage *storage);
   void setup();
   void loop();
 

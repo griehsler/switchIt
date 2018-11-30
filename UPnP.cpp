@@ -3,6 +3,9 @@
 #include <functional>
 #include <ESP8266mDNS.h>
 
+//#define DEBUG
+//#define FULLDEBUG
+
 UPnP::UPnP(Logger *logger, HTTPServer *http, Settings *settings, HTMLProvider *htmlProvider, Commands *commands)
 {
   _logger = logger;
@@ -89,7 +92,7 @@ void UPnP::loop()
     }
 
     Serial.print(", port ");
-    Serial.println(UDP.remotePort());
+    Serial.println(_UDP.remotePort());
     Serial.println("Request:");
     Serial.println(request);
 #endif
@@ -114,9 +117,17 @@ void UPnP::prepareIds()
 
 void UPnP::extendWebServer()
 {
+#ifdef DEBUG
+  Serial.print("Registering UPnP resources in http server ... ");
+#endif
+
   _http->server->on("/upnp/control/basicevent1", HTTP_POST, std::bind(&UPnP::handleBasicEventRequest, this));
   _http->server->on("/eventservice.xml", HTTP_GET, std::bind(&UPnP::handleEventServiceRequest, this));
   _http->server->on("/setup.xml", HTTP_GET, std::bind(&UPnP::handleSetupRequest, this));
+
+#ifdef DEBUG
+  Serial.println("done");
+#endif
 }
 
 void UPnP::handleBasicEventRequest()
