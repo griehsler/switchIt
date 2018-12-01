@@ -6,13 +6,14 @@
 //#define DEBUG
 //#define FULLDEBUG
 
-UPnP::UPnP(Logger *logger, HTTPServer *http, Settings *settings, HTMLProvider *htmlProvider, Commands *commands)
+UPnP::UPnP(Logger *logger, HTTPServer *http, Settings *settings, HTMLProvider *htmlProvider, Commands *commands, GPIO *gpio)
 {
   _logger = logger;
   _http = http;
   _settings = settings;
   _htmlProvider = htmlProvider;
   _commands = commands;
+  _gpio = gpio;
 
   _ipMulti = IPAddress(239, 255, 255, 250);
 
@@ -60,7 +61,7 @@ void UPnP::respondToSearch()
 #ifdef DEBUG
   Serial.println("Response sent");
 #endif
-#ifdef DEBUG
+#ifdef FULLDEBUG
   Serial.print(response);
 #endif
 }
@@ -97,7 +98,7 @@ void UPnP::loop()
     Serial.println(request);
 #endif
 
-    if (request.indexOf("M-SEARCH") != -1 && request.indexOf(serviceType) != -1)
+    if (request.indexOf("M-SEARCH") != -1 && request.indexOf(searchServiceType) != -1)
       respondToSearch();
   }
 }
@@ -136,32 +137,46 @@ void UPnP::handleBasicEventRequest()
 
 #ifdef DEBUG
   Serial.println("Responding to  /upnp/control/basicevent1 ...");
-
-  for (int x = 0; x <= _http->server->args(); x++)
-  {
-    Serial.println(_http->server->arg(x));
-  }
-
-  Serial.print("request:");
-  Serial.println(request);
 #endif
 
   String reply = "";
-  if (request.indexOf("<BinaryState>1</BinaryState>") > 0)
+  if (request.indexOf("GetBinaryState") > 0)
   {
+#ifdef DEBUG
+    Serial.println("Got state inquiry request via UPNP");
+#endif
+
+    String answer = "0";
+    if (_gpio->getRelayState() == "ON")
+      answer = "1";
+    reply = _htmlProvider->getSwitchCommandResponse("Get", answer);
+  }
+  else if (request.indexOf("<BinaryState>1</BinaryState>") > 0)
+  {
+#ifdef DEBUG
     Serial.println("Got turn on request via UPNP");
+#endif
     _logger->writeLog(LOG_INFO, "Got turn on request via UPNP");
     _commands->on();
+    reply = _htmlProvider->getSwitchCommandResponse("Set", "1");
   }
 
-  if (request.indexOf("<BinaryState>0</BinaryState>") > 0)
+  else if (request.indexOf("<BinaryState>0</BinaryState>") > 0)
   {
+#ifdef DEBUG
     Serial.println("Got turn off request via UPNP");
+#endif
     _logger->writeLog(LOG_INFO, "Got turn off request via UPNP");
     _commands->off();
+    reply = _htmlProvider->getSwitchCommandResponse("Set", "0");
   }
 
-  _http->server->send(200, "text/plain", reply);
+  _http->server->send(200, "text/xml", reply);
+
+#ifdef FULLDEBUG
+  Serial.print("response:");
+  Serial.println(reply);
+#endif
 }
 
 void UPnP::handleEventServiceRequest()

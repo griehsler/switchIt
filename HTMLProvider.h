@@ -12,6 +12,7 @@ public:
   String getEventServiceXml();
   String getSetupXml(String name, String uuid, String serialNumber);
   String getSsdpSearchResponse(String serverUrl, String uuid, String st);
+  String getSwitchCommandResponse(String op, String requestedState);
 
 private:
   Settings *_settings;

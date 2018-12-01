@@ -23,7 +23,7 @@ MQTT _mqtt(&_settings);
 GPIO _gpio(&_settings, &_logger, &_mqtt);
 Commands _commands(&_settings, &_gpio);
 HTTPServer _http(&server, &_settings, &_logger, &_htmlProvider, &_commands, &_storage);
-UPnP _upnp(&_logger, &_http, &_settings, &_htmlProvider, &_commands);
+UPnP _upnp(&_logger, &_http, &_settings, &_htmlProvider, &_commands, &_gpio);
 
 void setup()
 {

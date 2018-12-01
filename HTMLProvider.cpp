@@ -172,6 +172,22 @@ String HTMLProvider::getSsdpSearchResponse(String serverUrl, String uuid, String
     "X-User-Agent: redsonic\r\n\r\n";
 }
 
+String HTMLProvider::getSwitchCommandResponse(String op, String requestedState)
+{
+  return
+    "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+    "<s:Envelope "
+    "xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+    "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"
+    "<s:Body>"
+    "<u:" + op + "BinaryStateResponse "
+    "xmlns:u=\"urn:Belkin:service:basicevent:1\">"
+    "<BinaryState>" + requestedState + "</BinaryState>"
+    "</u:" + op + "BinaryStateResponse>"
+    "</s:Body>"
+    "</s:Envelope>";
+}
+
 String HTMLProvider::toChecked(bool value)
 {
   if (value)
