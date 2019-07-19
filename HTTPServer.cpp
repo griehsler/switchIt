@@ -24,14 +24,11 @@ void HTTPServer::setup()
 
   server->begin();
   Serial.println("HTTP server started");
-
-  MDNS.addService("http", "tcp", 80);
 }
 
 void HTTPServer::loop()
 {
   server->handleClient();
-  MDNS.update();
 }
 
 void HTTPServer::handleRoot()
