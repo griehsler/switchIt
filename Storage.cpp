@@ -5,8 +5,11 @@ void Storage::ensureInitialized()
 {
   if (!_isInitialized)
   {
-    _isInitialized = true;
-    SPIFFS.begin();
+    _isInitialized = SPIFFS.begin();
+    if (!_isInitialized)
+    {
+      Serial.println("Failed to initialize SPIFFS!");
+    }
   }
 }
 
