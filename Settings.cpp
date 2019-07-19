@@ -24,9 +24,8 @@ void Settings::store()
 
 void Settings::storeDeviceSettings()
 {
-  StaticJsonBuffer<1024> jsonBuffer;
+  StaticJsonDocument<1024> deviceSettings;
 
-  JsonObject &deviceSettings = jsonBuffer.createObject();
   deviceSettings["hostName"] = hostName;
   deviceSettings["deviceName"] = deviceName;
   deviceSettings["buttonMode"] = buttonMode;
@@ -47,7 +46,7 @@ void Settings::storeDeviceSettings()
   deviceSettings["emulateRelay"] = emulateRelay;
 
   String newSettings;
-  deviceSettings.prettyPrintTo(newSettings);
+  serializeJsonPretty(deviceSettings, newSettings);
   _storage->writeFile(deviceSettingsFile, newSettings);
 }
 
@@ -62,8 +61,8 @@ void Settings::loadDeviceSettings()
   }
   else
   {
-    StaticJsonBuffer<1024> jsonBuffer;
-    JsonObject &deviceSettings = jsonBuffer.parseObject(storedSettings);
+    StaticJsonDocument<1024> deviceSettings;
+    deserializeJson(deviceSettings, storedSettings);
 
     hostName = deviceSettings["hostName"].as<String>();
     deviceName = deviceSettings["deviceName"].as<String>();
@@ -85,7 +84,7 @@ void Settings::loadDeviceSettings()
     emulateRelay = deviceSettings["emulateRelay"].as<bool>();
 
 #ifdef FULLDEBUG
-    deviceSettings.prettyPrintTo(Serial);
+    serializeJsonPretty(deviceSettings, Serial);
 #endif
   }
 
@@ -101,31 +100,29 @@ void Settings::loadWifiSettings()
     return;
   }
 
-  StaticJsonBuffer<512> jsonBuffer;
-  JsonObject &deviceSettings = jsonBuffer.parseObject(storedSettings);
-  otherAPSSID = deviceSettings["ssid"].as<String>();
-  otherAPPassword = deviceSettings["password"].as<String>();
+  StaticJsonDocument<512> wifiSettings;
+  deserializeJson(wifiSettings, storedSettings);
+  otherAPSSID = wifiSettings["ssid"].as<String>();
+  otherAPPassword = wifiSettings["password"].as<String>();
 }
 
 void Settings::storeWifiSettings()
 {
-  StaticJsonBuffer<512> jsonBuffer;
-  JsonObject &wifiSettings = jsonBuffer.createObject();
+  StaticJsonDocument<512> wifiSettings;
   wifiSettings["ssid"] = otherAPSSID;
   wifiSettings["password"] = otherAPPassword;
   String newSettings;
-  wifiSettings.prettyPrintTo(newSettings);
+  serializeJsonPretty(wifiSettings, newSettings);
   _storage->writeFile(wifiSettingsFile, newSettings);
 }
 
 String Settings::getStateSummary(String statusCode)
 {
   String result;
-  StaticJsonBuffer<512> jsonBuffer;
-  JsonObject &statusJson = jsonBuffer.createObject();
+  StaticJsonDocument<512> statusJson;
   statusJson["device"] = deviceName;
   statusJson["state"] = statusCode;
-  statusJson.prettyPrintTo(result);
+  serializeJsonPretty(statusJson, result);
   return result;
 }
 
@@ -140,9 +137,9 @@ String Settings::getStoredState()
 
   if (storedStatus && storedStatus != "")
   {
-    StaticJsonBuffer<512> jsonBuffer;
-    JsonObject &statusJson = jsonBuffer.parseObject(storedStatus);
-    if (statusJson.success())
+    StaticJsonDocument<512> statusJson;
+    ;
+    if (deserializeJson(statusJson, storedStatus) == DeserializationError::Ok)
     {
 #ifdef DEBUG
       Serial.println("Read startup state, applying it.");
