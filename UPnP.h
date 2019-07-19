@@ -5,6 +5,7 @@
 #include "HTMLProvider.h"
 #include "Commands.h"
 #include "Logger.h"
+#include "Network.h"
 #include <WiFiUdp.h>
 
 class UPnP

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Network.h"
 #include <Arduino.h>
 #include <WiFiUdp.h>
 #include "Settings.h"
