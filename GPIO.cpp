@@ -9,6 +9,8 @@ GPIO::GPIO(Settings *settings, Logger *logger, MQTT *mqtt)
 
 void GPIO::setup()
 {
+  longPressStart = millis();
+
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(relayPin, OUTPUT);
   pinMode(buttonPin, INPUT_PULLUP);
@@ -72,14 +74,31 @@ void GPIO::loop()
   {
     bool currentlyPressed = digitalRead(buttonPin) == LOW;
 
-    if ((isSwitch && !buttonPressed && currentlyPressed) ||
-        (isTouch && buttonPressed != currentlyPressed))
+    if (currentlyPressed != lastPressed)
+    {
+      lastPressed = currentlyPressed;
+      longPressStart = millis();
+#ifdef DEBUG
+      Serial.println("press state changed");
+#endif
+    }
+#ifdef FULLDEBUG
+    Serial.print("time sincelast state change: ");
+    Serial.println(millis() - longPressStart);
+#endif
+    if (millis() - longPressStart > debounceDelay)
+    {
+      longPressed = lastPressed;
+    }
+
+    if ((isSwitch && !buttonPressed && longPressed) ||
+        (isTouch && buttonPressed != longPressed))
     {
       Serial.println("Button pressed, switching");
       _logger->writeLog(LOG_INFO, "Button pressed, switching");
       switchRelay();
     }
 
-    buttonPressed = currentlyPressed;
+    buttonPressed = longPressed;
   }
 }

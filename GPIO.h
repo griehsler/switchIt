@@ -26,4 +26,8 @@ private:
   MQTT *_mqtt;
   bool relayOn;
   bool buttonPressed;
+  bool lastPressed;
+  bool longPressed;
+  unsigned long longPressStart;
+  unsigned long debounceDelay = 100;
 };
