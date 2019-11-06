@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "Settings.h"
 #include "Logger.h"
 #include "Network.h"
