@@ -32,11 +32,13 @@ bool Network::connectToWifi()
   for (int i = 0; i < 60; i++)
   {
     Serial.print(".");
-    if (WiFi.status() == WL_CONNECTED)
+    if (WiFi.isConnected())
     {
       Serial.println("");
       Serial.print("connected, IP Address: ");
       Serial.println(WiFi.localIP());
+      wasConnected = true;
+      reconnectCount = 0;
       return true;
     }
     delay(1000);
@@ -61,3 +63,25 @@ void Network::startAP()
   Serial.print("IP Address: ");
   Serial.println(WiFi.softAPIP());
 }
+
+void Network::loop()
+{
+  if (wasConnected && !WiFi.isConnected())
+  {
+    Serial.println("lost connection to WIFI!");
+    if (!connectToWifi())
+    {
+      reconnectCount++;
+      Serial.print("failed for ");
+      Serial.print(reconnectCount);
+      Serial.println(" times!");
+
+      if (reconnectCount >= 10)
+      {
+        Serial.println("falling back to AP mode.");
+        startAP();
+      }
+    }
+  }
+}
+

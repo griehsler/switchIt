@@ -30,7 +30,7 @@ void setup()
 {
   using namespace std::placeholders; // for `_1`
 
-  Serial.begin(115200);
+  Serial.begin(74880);
   _gpio.setup();
   Serial.println("starting initialization ...");
   _gpio.led(true);
@@ -50,6 +50,7 @@ void setup()
 void loop()
 {
   _gpio.loop();
+  _network.loop();
   _http.loop();
   _upnp.loop();
   _mqtt.loop();
