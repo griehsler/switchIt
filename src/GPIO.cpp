@@ -11,6 +11,11 @@ void GPIO::setup()
 {
   longPressStart = millis();
 
+  if (_settings->customButtonGpio > 0)
+    buttonPin = _settings->customButtonGpio;
+  if (_settings->customRelayGpio > 0)
+    relayPin = _settings->customRelayGpio;
+
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(relayPin, OUTPUT);
   pinMode(buttonPin, INPUT_PULLUP);

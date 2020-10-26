@@ -72,6 +72,9 @@ void HTTPServer::handleConfig()
       _settings->mqttSubscribeTopic = server->arg("mqttsubscribe");
       _settings->mqttPublishTopic = server->arg("mqttpublish");
 
+      _settings->customButtonGpio = server->arg("customButtonGpio").toInt();
+      _settings->customRelayGpio = server->arg("customRelayGpio").toInt();
+
       _settings->emulateRelay = server->arg("emulaterelay") == "enabled";
 
       _settings->store();

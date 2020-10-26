@@ -43,6 +43,9 @@ void Settings::storeDeviceSettings()
   deviceSettings["mqttSubscribeTopic"] = mqttSubscribeTopic;
   deviceSettings["mqttPublishTopic"] = mqttPublishTopic;
 
+  deviceSettings["customButtonGpio"] = customButtonGpio;
+  deviceSettings["customRelayGpio"] = customRelayGpio;
+
   deviceSettings["emulateRelay"] = emulateRelay;
 
   String newSettings;
@@ -80,6 +83,9 @@ void Settings::loadDeviceSettings()
     mqttPassword = deviceSettings["mqttPassword"].as<String>();
     mqttSubscribeTopic = deviceSettings["mqttSubscribeTopic"].as<String>();
     mqttPublishTopic = deviceSettings["mqttPublishTopic"].as<String>();
+
+    customButtonGpio = deviceSettings["customButtonGpio"].as<int>();
+    customRelayGpio = deviceSettings["customRelayGpio"].as<int>();
 
     emulateRelay = deviceSettings["emulateRelay"].as<bool>();
 

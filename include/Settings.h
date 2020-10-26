@@ -33,6 +33,9 @@ public:
   String mqttPublishTopic;
   String mqttSubscribeTopic;
 
+  int customButtonGpio = 0;
+  int customRelayGpio = 0;
+
   bool emulateRelay = false;
 
   void load();
