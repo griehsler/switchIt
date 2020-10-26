@@ -10,6 +10,7 @@
 
 #include <ESP8266WebServer.h>
 
+//#define SERIAL_OUTPUT
 //#define DEBUG
 //#define FULLDEBUG
 
@@ -30,7 +31,10 @@ void setup()
 {
   using namespace std::placeholders; // for `_1`
 
+#ifdef SERIAL_OUTPUT
   Serial.begin(74880);
+#endif
+
   _gpio.setup();
   Serial.println("starting initialization ...");
   _gpio.led(true);
