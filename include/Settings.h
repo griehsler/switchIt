@@ -1,17 +1,16 @@
 #pragma once
 
-#include "Storage.h"
+#include <LoggerSettings.h>
+#include <NetworkSettings.h>
+#include <Storage.h>
 
-class Settings
+class Settings: public virtual NetworkSettings, public virtual LoggerSettings
 {
 public:
   Settings(Storage *storage);
 
   const int httpServerPort = 80;
 
-  String otherAPSSID;
-  String otherAPPassword;
-  String hostName;
   String deviceName;
 
   bool invertSwitch = false;
@@ -20,10 +19,6 @@ public:
   const int BUTTON_SWITCH = 1;
   const int BUTTON_TOUCH = 2;
   int buttonMode = BUTTON_DISABLED;
-
-  bool syslogEnabled = false;
-  String syslogServer;
-  int syslogServerPort = 514;
 
   bool mqttEnabled = false;
   String mqttServer;

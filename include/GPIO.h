@@ -1,9 +1,9 @@
 #pragma once
 
 #include <Arduino.h>
-#include "Settings.h"
-#include "Logger.h"
+#include <Logger.h>
 #include "MQTT.h"
+#include "Settings.h"
 
 class GPIO
 {

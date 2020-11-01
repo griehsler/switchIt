@@ -1,8 +1,8 @@
 #pragma once
 
 #include <Arduino.h>
-#include "Settings.h"
 #include "GPIO.h"
+#include "Settings.h"
 
 class Commands
 {

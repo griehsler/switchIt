@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "Settings.h"
-#include "Logger.h"
-#include "Network.h"
+#include <Logger.h>
+#include <Network.h>
 #include "MQTT.h"
 #include "HTTPServer.h"
 #include "HTMLProvider.h"
@@ -10,7 +10,7 @@
 
 #include <ESP8266WebServer.h>
 
-//#define SERIAL_OUTPUT
+#define SERIAL_OUTPUT
 //#define DEBUG
 //#define FULLDEBUG
 
@@ -35,6 +35,8 @@ void setup()
   Serial.begin(74880);
 #endif
 
+  pinMode(PIN_A0, INPUT);
+
   _gpio.setup();
   Serial.println("starting initialization ...");
   _gpio.led(true);
@@ -58,4 +60,15 @@ void loop()
   _http.loop();
   _upnp.loop();
   _mqtt.loop();
+
+  int minAnalog = 680;
+  int maxAnalog = 940;
+
+  int analogValue = analogRead(PIN_A0) - minAnalog;
+  analogValue = min(maxAnalog, max(minAnalog, analogValue));
+  float percentage = ((float)analogValue / (maxAnalog - minAnalog)) * 100;
+  Serial.print("Analog in: ");
+  Serial.print(analogValue);
+  Serial.print(", Battery level: ");
+  Serial.println(percentage);
 }

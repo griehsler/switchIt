@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Settings.h"
 #include <PubSubClient.h>
 #include <functional>
+
+#include "Settings.h"
 
 #define MQTT_MESSAGE_CALLBACK std::function<void(String, String *)> _callback
 

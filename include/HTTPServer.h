@@ -1,13 +1,13 @@
 #pragma once
 
+#include <ESP8266WebServer.h>
+#include <ESP8266HTTPUpdateServer.h>
+
+#include <Logger.h>
+#include <Storage.h>
 #include "Settings.h"
 #include "HTMLProvider.h"
 #include "Commands.h"
-#include "Storage.h"
-#include "Logger.h"
-
-#include <ESP8266WebServer.h>
-#include <ESP8266HTTPUpdateServer.h>
 
 class HTTPServer
 {
