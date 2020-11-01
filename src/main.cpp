@@ -1,14 +1,14 @@
 #include <Arduino.h>
-#include "Settings.h"
+#include <ESP8266WebServer.h>
+
 #include <Logger.h>
 #include <Network.h>
-#include "MQTT.h"
 #include "HTTPServer.h"
 #include "HTMLProvider.h"
 #include "GPIO.h"
+#include "MQTT.h"
+#include "Settings.h"
 #include "UPnP.h"
-
-#include <ESP8266WebServer.h>
 
 //#define SERIAL_OUTPUT
 //#define DEBUG
@@ -60,15 +60,4 @@ void loop()
   _http.loop();
   _upnp.loop();
   _mqtt.loop();
-
-  int minAnalog = 680;
-  int maxAnalog = 940;
-
-  int analogValue = analogRead(PIN_A0) - minAnalog;
-  analogValue = min(maxAnalog, max(minAnalog, analogValue));
-  float percentage = ((float)analogValue / (maxAnalog - minAnalog)) * 100;
-  Serial.print("Analog in: ");
-  Serial.print(analogValue);
-  Serial.print(", Battery level: ");
-  Serial.println(percentage);
 }
