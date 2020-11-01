@@ -10,7 +10,7 @@
 
 #include <ESP8266WebServer.h>
 
-#define SERIAL_OUTPUT
+//#define SERIAL_OUTPUT
 //#define DEBUG
 //#define FULLDEBUG
 
