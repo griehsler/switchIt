@@ -108,15 +108,13 @@ void Settings::loadWifiSettings()
 
   StaticJsonDocument<512> wifiSettings;
   deserializeJson(wifiSettings, storedSettings);
-  otherAPSSID = wifiSettings["ssid"].as<String>();
-  otherAPPassword = wifiSettings["password"].as<String>();
+  NetworkSettings::readFromJson(wifiSettings);
 }
 
 void Settings::storeWifiSettings()
 {
   StaticJsonDocument<512> wifiSettings;
-  wifiSettings["ssid"] = otherAPSSID;
-  wifiSettings["password"] = otherAPPassword;
+  NetworkSettings::writeToJson(wifiSettings);
   String newSettings;
   serializeJsonPretty(wifiSettings, newSettings);
   _storage->writeFile(wifiSettingsFile, newSettings);
