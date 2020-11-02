@@ -42,7 +42,7 @@ void setup()
   _gpio.led(true);
   _settings.load();
   _network.setup();
-  _logger.setup();
+  _logger.setup(_settings.hostName);
   _logger.writeLog(LOG_NOTICE, "starting up");
   _upnp.setup();
   _http.setup();

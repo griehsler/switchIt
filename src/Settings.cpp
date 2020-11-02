@@ -26,14 +26,11 @@ void Settings::storeDeviceSettings()
 {
   StaticJsonDocument<1024> deviceSettings;
 
-  deviceSettings["hostName"] = hostName;
   deviceSettings["deviceName"] = deviceName;
   deviceSettings["buttonMode"] = buttonMode;
   deviceSettings["invertSwitch"] = invertSwitch;
 
-  deviceSettings["syslogEnabled"] = syslogEnabled;
-  deviceSettings["syslogServer"] = syslogServer;
-  deviceSettings["syslogServerPort"] = syslogServerPort;
+  LoggerSettings::writeToJson(deviceSettings);
 
   deviceSettings["mqttEnabled"] = mqttEnabled;
   deviceSettings["mqttServer"] = mqttServer;
@@ -67,14 +64,11 @@ void Settings::loadDeviceSettings()
     StaticJsonDocument<1024> deviceSettings;
     deserializeJson(deviceSettings, storedSettings);
 
-    hostName = deviceSettings["hostName"].as<String>();
     deviceName = deviceSettings["deviceName"].as<String>();
     buttonMode = deviceSettings["buttonMode"].as<int>();
     invertSwitch = deviceSettings["invertSwitch"].as<bool>();
 
-    syslogEnabled = deviceSettings["syslogEnabled"].as<bool>();
-    syslogServer = deviceSettings["syslogServer"].as<String>();
-    syslogServerPort = deviceSettings["syslogServerPort"].as<int>();
+    LoggerSettings::readFromJson(deviceSettings);
 
     mqttEnabled = deviceSettings["mqttEnabled"].as<bool>();
     mqttServer = deviceSettings["mqttServer"].as<String>();
