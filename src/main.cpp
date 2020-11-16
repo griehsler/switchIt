@@ -35,8 +35,6 @@ void setup()
   Serial.begin(74880);
 #endif
 
-  pinMode(PIN_A0, INPUT);
-
   _gpio.setup();
   Serial.println("starting initialization ...");
   _gpio.led(true);
