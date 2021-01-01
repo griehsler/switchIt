@@ -56,7 +56,6 @@ void Settings::loadDeviceSettings()
   if (!storedSettings || storedSettings == "")
   {
     Serial.println("Found no device identity settings, using default values:");
-    hostName = "SwitchIt" + String(ESP.getFlashChipId());
     deviceName = "light";
   }
   else
@@ -84,25 +83,35 @@ void Settings::loadDeviceSettings()
     emulateRelay = deviceSettings["emulateRelay"].as<bool>();
 
 #ifdef FULLDEBUG
+    Serial.println("device settings:");
     serializeJsonPretty(deviceSettings, Serial);
+    Serial.println();
 #endif
   }
 
-  Serial.println("HostName=" + hostName + ", DeviceName=" + deviceName);
+  Serial.println("DeviceName=" + deviceName);
 }
 
 void Settings::loadWifiSettings()
 {
   String storedSettings = _storage->readFile(wifiSettingsFile);
-  if (!storedSettings || storedSettings == "")
+  if (!storedSettings || storedSettings == "" || storedSettings == NULL || storedSettings == "null")
   {
     Serial.println("Found no WIFI client settings.");
+    hostName = "SwitchIt" + String(ESP.getFlashChipId());
+    Serial.println("Using default host name: " + hostName);
     return;
   }
 
   StaticJsonDocument<512> wifiSettings;
   deserializeJson(wifiSettings, storedSettings);
   NetworkSettings::readFromJson(wifiSettings);
+
+#ifdef FULLDEBUG
+  Serial.println("network settings:");
+  serializeJsonPretty(wifiSettings, Serial);
+  Serial.println();
+#endif
 }
 
 void Settings::storeWifiSettings()
@@ -111,7 +120,12 @@ void Settings::storeWifiSettings()
   NetworkSettings::writeToJson(wifiSettings);
   String newSettings;
   serializeJsonPretty(wifiSettings, newSettings);
+#ifdef FULLDEBUG
+  Serial.println("storing new raw network settings:");
+  Serial.println(newSettings);
+#endif
   _storage->writeFile(wifiSettingsFile, newSettings);
+  Serial.println("stored network settings.");
 }
 
 String Settings::getStateSummary(String statusCode)

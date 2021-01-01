@@ -18,7 +18,8 @@ void HTTPServer::setup()
   // Serial.println("HTTP server starting");
   server->on("/", std::bind(&HTTPServer::handleRoot, this));
   server->on("/config", std::bind(&HTTPServer::handleConfig, this));
-  server->on("/command", std::bind(&HTTPServer::handleCommand, this));
+  server->on("/api/status", std::bind(&HTTPServer::handleApiStatus, this));
+
   server->onNotFound(std::bind(&HTTPServer::handleNotFound, this));
   _httpUpdater.setup(server, "/update");
 
@@ -103,21 +104,38 @@ void HTTPServer::handleConfig()
     ESP.restart();
 }
 
-void HTTPServer::handleCommand()
+void HTTPServer::handleApiStatus()
 {
-  Serial.print("Received command via web: ");
-  Serial.println(server->arg("name"));
+  String requestBody;
+  String response;
 
-  if (server->arg("name") != _commands->CMD_STATUS)
-    _logger->writeLog(LOG_INFO, "Received command via web: " + server->arg("name"));
+  HTTPMethod method = server->method();
 
-  String reply;
-  if (!_commands->execute(server->arg("name"), &reply))
-    server->send(400, "text/plain", "unknown command");
-  else if (reply && reply != "")
-    server->send(200, "text/html", reply);
-  else
-    handleRoot();
+#ifdef DEBUG
+  Serial.print("Received ");
+  Serial.print(method);
+  Serial.println(" on /api/status");
+#endif
+
+  switch (method)
+  {
+  case HTTP_PUT:
+    requestBody = server->arg("plain");
+    Serial.println("Request body: " + requestBody);
+    if (!_commands->execute(requestBody, &response))
+    {
+      server->send(400, "text/plain", "unknown command: " + requestBody);
+      break;
+    }
+    _logger->writeLog(LOG_INFO, "Received command via api: " + requestBody);
+  case HTTP_GET:
+    response = _commands->getStatus();
+    server->send(200, "text/json", response);
+    break;
+  default:
+    server->send(405);
+    break;
+  }
 }
 
 String HTTPServer::insertTemplateValue(String content, String placeHolder, String value)

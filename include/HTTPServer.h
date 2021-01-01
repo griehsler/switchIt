@@ -30,7 +30,7 @@ private:
   void handleRoot();
   void handleConfig();
   void handleNotFound();
-  void handleCommand();
+  void handleApiStatus();
   String insertTemplateValue(String content, String placeHolder, String value);
   void sendSectionContent(String content);
 };

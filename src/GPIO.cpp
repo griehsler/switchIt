@@ -59,15 +59,15 @@ void GPIO::switchRelay()
 String GPIO::getRelayState()
 {
   if (relayOn)
-    return "ON";
+    return "on";
   else
-    return "OFF";
+    return "off";
 }
 
 void GPIO::restoreLastState()
 {
   String storedState = _settings->getStoredState();
-  relay(storedState == "ON");
+  relay(storedState == "on");
 }
 
 void GPIO::loop()
