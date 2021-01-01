@@ -2,6 +2,7 @@
 
 #include <PubSubClient.h>
 #include <functional>
+#include <WiFiClient.h>
 
 #include "Settings.h"
 
@@ -17,9 +18,11 @@ public:
 
 private:
   Settings *_settings;
-  PubSubClient *_client;
+  WiFiClient _wifi;
+  PubSubClient _client = PubSubClient(_wifi);
   MQTT_MESSAGE_CALLBACK;
 
+  bool connect();
   void publishMessage(String message);
   void mqttCallback(char *topic, byte *payload, unsigned int length);
 };

@@ -121,7 +121,9 @@ void HTTPServer::handleApiStatus()
   {
   case HTTP_PUT:
     requestBody = server->arg("plain");
+#ifdef FULLDEBUG
     Serial.println("Request body: " + requestBody);
+#endif
     if (!_commands->execute(requestBody, &response))
     {
       server->send(400, "text/plain", "unknown command: " + requestBody);

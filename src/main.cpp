@@ -10,9 +10,9 @@
 #include "Settings.h"
 #include "UPnP.h"
 
-//#define SERIAL_OUTPUT
-//#define DEBUG
-//#define FULLDEBUG
+// #define SERIAL_OUTPUT
+// #define DEBUG
+// #define FULLDEBUG
 
 ESP8266WebServer server(80);
 
